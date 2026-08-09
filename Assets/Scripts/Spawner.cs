@@ -8,8 +8,18 @@ using UnityEngine.SceneManagement;
 public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 {
 
+    public static Spawner Instance;
+
     [SerializeField] private NetworkPrefabRef _playerPrefab;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+    public Action<Transform> PlayerJoined;
+
+    public Action<Transform> PlayerLeft;
+
+    public Transform LocalTransform;
+
+    public List<Transform> PlayerInstances { get; private set; } = new List<Transform>();
 
     void Fusion.INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
 
@@ -26,6 +36,11 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     private bool mouseButton0;
     private bool mouseButton1;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Update()
     {
         mouseButton0 = mouseButton0 | Input.GetMouseButton(0);
@@ -33,6 +48,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         mouseButton1 = mouseButton1 | Input.GetMouseButton(1);
 
     }
+
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
@@ -68,6 +84,10 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
             _spawnedCharacters.Add(player, networkPlayerObject);
 
             runner.SetPlayerObject(player, networkPlayerObject);
+
+            PlayerInstances.Add(networkPlayerObject.transform);
+
+            PlayerJoined.Invoke(networkPlayerObject.transform);
         }
     }
 
@@ -77,6 +97,8 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         {
             runner.Despawn(networkObject);
             _spawnedCharacters.Remove(player);
+            PlayerLeft.Invoke(networkObject.transform);
+
         }
     }
 

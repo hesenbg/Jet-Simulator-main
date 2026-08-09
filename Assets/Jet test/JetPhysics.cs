@@ -68,6 +68,13 @@ public class JetPhysics : NetworkBehaviour
         DragMag = Drag.magnitude;
     }
 
+    public override void Spawned()
+    {
+        if (Object.HasInputAuthority)
+        {
+            Spawner.Instance.LocalTransform = transform;
+        }
+    }
 
     public override void FixedUpdateNetwork()
     {
