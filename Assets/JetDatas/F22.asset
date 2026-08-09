@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f954207bb394cae4d97f03130b121786, type: 3}
+  m_Name: F22
+  m_EditorClassIdentifier: Assembly-CSharp::JetParameters
+  ThrustForceAmount: 150
+  MaxVelocity: 200
+  WingSurfaceArea: 1
+  SurfaceAreaExposed: 1
+  LiftCoefficientCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1.2058394
+      outSlope: 1.2058394
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.22406176
+      value: 0.2701825
+      inSlope: 0.977515
+      outSlope: 0.977515
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.3891933
+      value: 0.39389747
+      inSlope: -0.081243604
+      outSlope: -0.081243604
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.58392245
+      outWeight: 0.5857062
+    - serializedVersion: 3
+      time: 0.54271245
+      value: -0.19952595
+      inSlope: -4.0484366
+      outSlope: -4.0484366
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.6436666
+      value: -0.6267039
+      inSlope: -3.2684188
+      outSlope: -3.2684188
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.72819525
+      value: -0.821579
+      inSlope: -2.3054328
+      outSlope: -2.3054328
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  DragCoefficientCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2.0535083
+      outSlope: 2.0535083
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.36928248
+      value: 0.7583247
+      inSlope: 1.2183417
+      outSlope: 1.2183417
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.38317522
+      outSlope: 0.38317522
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  YawThreshold: 1
+  AirDensity: 1
+  WeightAmplifier: 5
+  AirThresholdDistance: 2
+  AirThrustThreshold: 0.5
+  AirIncreaseRate: 0.8
+  AirBaseDragCoefficient: 0.5
+  AirBaseLiftCoefficient: 0.2
+  GroundThrustThreshold: 0
+  GroundIncreaseRate: 0.2
+  GroundBaseDragCoefficient: 0.5
+  GroundBaseLiftCoefficient: 0.1

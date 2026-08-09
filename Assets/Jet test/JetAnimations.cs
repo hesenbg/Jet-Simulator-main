@@ -28,21 +28,20 @@ public class JetAnimations : MonoBehaviour
         baseLeftFlaperon = LeftFlaperon.transform.localRotation;
         baseRightFlaperon = RightFlaperon.transform.localRotation;
     }
-
+     
     private void Update()
     {
-        JetInput input = phsyics.input;
         float t = RotationSpeed * Time.deltaTime;
-
-        Quaternion elevatorTarget = Quaternion.Euler(input.Pitch * MaxAngle, 0f, 0f);
+        
+        Quaternion elevatorTarget = Quaternion.Euler(phsyics.LocalPitch * MaxAngle, 0f, 0f);
         LeftElevator.transform.localRotation = Quaternion.Slerp(LeftElevator.transform.localRotation, baseLeftElevator * elevatorTarget, t);
         RightElevator.transform.localRotation = Quaternion.Slerp(RightElevator.transform.localRotation, baseRightElevator * elevatorTarget, t);
-
-        Quaternion rudderTarget = Quaternion.Euler(0f, input.Yaw * MaxAngle, 0f);
+        
+        Quaternion rudderTarget = Quaternion.Euler(0f, phsyics.LocalYaw * MaxAngle, 0f);
         LeftVerticalStabilizator.transform.localRotation = Quaternion.Slerp(LeftVerticalStabilizator.transform.localRotation, baseLeftVStab * rudderTarget, t);
         RightVerticalStabilizator.transform.localRotation = Quaternion.Slerp(RightVerticalStabilizator.transform.localRotation, baseRightVStab * rudderTarget, t);
-
-        float rollAngle = input.Roll * MaxAngle;
+        
+        float rollAngle = phsyics.LocalRoll * MaxAngle;
         Quaternion leftFlaperonTarget = Quaternion.Euler(rollAngle, 0f, 0f);
         Quaternion rightFlaperonTarget = Quaternion.Euler(-rollAngle, 0f, 0f);
         LeftFlaperon.transform.localRotation = Quaternion.Slerp(LeftFlaperon.transform.localRotation, baseLeftFlaperon * leftFlaperonTarget, t);

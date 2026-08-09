@@ -1,60 +1,39 @@
 using UnityEngine;
 
-public class JetParameters : MonoBehaviour
+[CreateAssetMenu(fileName = "JetParameters", menuName = "Jet/Jet Parameters")]
+public class JetParameters : ScriptableObject
 {
-    public float JetAltitute;
+    [Header("Thrust Settings")]
+    public float ThrustForceAmount = 10f;
+    public float MaxVelocity;
 
-    public float GForce;
+    [Header("Lift/Drag - Aerodynamics")]
+    public float WingSurfaceArea;
+    public float SurfaceAreaExposed;
 
-    public float CurrentSpeed;
+    [Header("Lift Coefficient")]
+    public AnimationCurve LiftCoefficientCurve;
 
-    public float CurrentAOA;
+    [Header("Drag Coefficient")]
+    public AnimationCurve DragCoefficientCurve;
 
-    JetPhysics Physics;
+    [Header("Control")]
+    public float YawThreshold;
+    public float AirDensity;
+    public float WeightAmplifier;
 
-    [Header("Settings")]
-    public float TimeBetweenChanges;
-    float CurrentTimeBetweenChanges;
-
-    float DetectedSpeed;
-    public float SpeedChangeAmount;
-
-    float DetectedAOA;
-    public float AOAChangeAmount;
-
-    private void Start()
-    {
-        Physics = GetComponent<JetPhysics>();
-    }
-
-    private void Update()
-    {
-
-        CurrentSpeed = Physics.rb.linearVelocity.magnitude;
-
-        CurrentAOA = Physics.AOA;
-
-        CalculateGForce();
-
-    }
-
-
-    private void CalculateGForce()
-    {
-        if (CurrentTimeBetweenChanges < TimeBetweenChanges)
-        {
-            CurrentTimeBetweenChanges += Time.deltaTime;
-        }
-        else
-        {
-            DetectedSpeed = CurrentSpeed;
-
-            DetectedAOA = CurrentAOA;
-
-            SpeedChangeAmount = CurrentSpeed - DetectedSpeed;
-
-            AOAChangeAmount = CurrentAOA - DetectedAOA;
-        }
-
-    }
+    [Header("State Thresholds")]
+    [Header("Air")]
+    public float AirThresholdDistance;
+    public float AirThrustThreshold;
+    public float AirIncreaseRate;
+    public float AirBaseDragCoefficient;
+    public float AirBaseLiftCoefficient;
+    [Header("Ground")]
+    public float GroundThrustThreshold;
+    public float GroundIncreaseRate;
+    public float GroundBaseDragCoefficient;
+    public float GroundBaseLiftCoefficient;
 }
+
+

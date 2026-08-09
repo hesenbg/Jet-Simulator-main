@@ -1,16 +1,26 @@
 using Fusion;
+using System;
 using UnityEngine;
 
 public enum WeaponType {Missle, MachineGun }
 
+public enum JetState { Ground, Air }
+
+[Serializable]
 public struct NetworkInputData : INetworkInput
 {
-    public float Thrust;
-    public float Yaw;
-    public float Roll;
+    // jet inputs
+    public NetworkBool ThrustUp;
+    public NetworkBool ThrustDown;
+
+    public NetworkBool YawRight;
+    public NetworkBool YawLeft;
+
     public float Pitch;
 
-    NetworkBool IsFiring;
+    public float Roll;
 
-    WeaponType Weapon;
+    // general
+    public NetworkBool IsMouseLoced;
+    
 }

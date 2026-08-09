@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class JetCameraController : MonoBehaviour
 {
-    [SerializeField] Transform jetTarget;
+    public Transform jetTarget;
     [SerializeField] Vector3 offset = new Vector3(0f, 2f, -8f);
 
     [Header("Position SOD Params")]
@@ -15,7 +15,7 @@ public class JetCameraController : MonoBehaviour
 
     SODState posSodState;
 
-    private void Start()
+    public void PlaceCamera()
     {
         Vector3 initialTargetPos = jetTarget.position + (jetTarget.rotation * offset);
         posSodState = SOD.SODCreate(posF, posZ, posR, initialTargetPos);
@@ -26,7 +26,7 @@ public class JetCameraController : MonoBehaviour
         if (jetTarget == null) return;
 
         Quaternion targetRotation = Quaternion.LookRotation(jetTarget.forward, jetTarget.up);
-        Quaternion newRotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationDamping);
+        Quaternion newRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, 0f);
         Quaternion deltaRotation = newRotation * Quaternion.Inverse(transform.rotation);
 
         deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
@@ -35,7 +35,7 @@ public class JetCameraController : MonoBehaviour
         if (!float.IsNaN(axis.x) && angle != 0f)
         {
             transform.RotateAround(jetTarget.position, axis, angle);
-        }
+        } 
 
         Vector3 targetPosition = jetTarget.position + (jetTarget.rotation * offset);
         transform.position = SOD.SODUpdate(ref posSodState, Time.deltaTime, targetPosition);
