@@ -1126,7 +1126,7 @@ MonoBehaviour:
   JetIconParent: {fileID: 1182623419}
   JetIconPrefab: {fileID: 635341056391268613, guid: c7e76ec9ba836864a96500cf2480ae4e, type: 3}
   Scale: 10
-  MaxDistanceBetweenIcons: 250
+  MaxDistanceBetweenIcons: 150
 --- !u!4 &476697250
 Transform:
   m_ObjectHideFlags: 0

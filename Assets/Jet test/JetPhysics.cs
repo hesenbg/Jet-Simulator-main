@@ -74,6 +74,8 @@ public class JetPhysics : NetworkBehaviour
         {
             Spawner.Instance.LocalTransform = transform;
         }
+
+        Spawner.Instance.PlayerJoined.Invoke(this.transform);
     }
 
     public override void FixedUpdateNetwork()

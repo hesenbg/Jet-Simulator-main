@@ -39,6 +39,13 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     private void Awake()
     {
         Instance = this;
+
+        PlayerJoined += OnPlayerJoined;
+    }
+
+    private void OnPlayerJoined(Transform transform)
+    {
+        PlayerInstances.Add(transform);
     }
 
     private void Update()
@@ -84,8 +91,6 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
             _spawnedCharacters.Add(player, networkPlayerObject);
 
             runner.SetPlayerObject(player, networkPlayerObject);
-
-            PlayerInstances.Add(networkPlayerObject.transform);
 
             PlayerJoined.Invoke(networkPlayerObject.transform);
         }
