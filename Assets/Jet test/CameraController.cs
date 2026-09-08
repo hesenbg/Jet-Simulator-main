@@ -23,23 +23,33 @@ public class JetCameraController : MonoBehaviour
 
     private void LateUpdate()
     {
+        UpdateCam();
+    }
+
+    private void UpdateCam()
+    {
         if (jetTarget == null) return;
 
-        Quaternion targetRotation = Quaternion.LookRotation(jetTarget.forward, jetTarget.up);
-        Quaternion newRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, 0f);
-        Quaternion deltaRotation = newRotation * Quaternion.Inverse(transform.rotation);
+        Vector3 targetEuler = jetTarget.eulerAngles;
+
+        Quaternion targetRotation = Quaternion.Euler(targetEuler.x, targetEuler.y, 0f);
+
+        Quaternion deltaRotation = targetRotation * Quaternion.Inverse(transform.rotation);
 
         deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
+
         if (angle > 180f) angle -= 360f;
 
         if (!float.IsNaN(axis.x) && angle != 0f)
         {
-            transform.RotateAround(jetTarget.position, axis, angle);
-        } 
+            transform.RotateAround(jetTarget.position, axis, angle); 
+        }
 
-        Vector3 targetPosition = jetTarget.position + (jetTarget.rotation * offset);
-        transform.position = SOD.SODUpdate(ref posSodState, Time.deltaTime, targetPosition);
+        Vector3 targetPosition = jetTarget.position + (Quaternion.Euler(targetEuler) * offset);
+
+        transform.position = targetPosition;
     }
+
 
     private void OnValidate()
     {

@@ -13,6 +13,8 @@ public class Radar : MonoBehaviour
 
     [SerializeField] Dictionary<Transform, RectTransform> JetIcons = new Dictionary<Transform, RectTransform>();
 
+    public float AngleOffset;
+
     private void Start()
     {
         Spawner.Instance.PlayerLeft += OnPlayerLeft;
@@ -31,10 +33,10 @@ public class Radar : MonoBehaviour
 
     private void OnPlayerJoined(Transform transform)
     {
+        if (JetIcons.ContainsKey(transform))
+            return;
+
         RectTransform JetIconTransform = Instantiate(JetIconPrefab, JetIconParent.transform).GetComponent<RectTransform>();
-
-        Debug.Log("added");
-
         JetIcons.Add(transform, JetIconTransform);
     }
 
@@ -58,6 +60,7 @@ public class Radar : MonoBehaviour
 
             rt.localPosition = offset;
             rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y);
+            rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y + AngleOffset);
         }
     }
 }

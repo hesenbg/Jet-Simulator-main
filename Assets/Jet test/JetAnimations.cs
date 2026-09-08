@@ -33,15 +33,15 @@ public class JetAnimations : MonoBehaviour
     {
         float t = RotationSpeed * Time.deltaTime;
         
-        Quaternion elevatorTarget = Quaternion.Euler(phsyics.LocalPitch * MaxAngle, 0f, 0f);
+        Quaternion elevatorTarget = Quaternion.Euler(phsyics.Pitch * MaxAngle, 0f, 0f);
         LeftElevator.transform.localRotation = Quaternion.Slerp(LeftElevator.transform.localRotation, baseLeftElevator * elevatorTarget, t);
         RightElevator.transform.localRotation = Quaternion.Slerp(RightElevator.transform.localRotation, baseRightElevator * elevatorTarget, t);
         
-        Quaternion rudderTarget = Quaternion.Euler(0f, phsyics.LocalYaw * MaxAngle, 0f);
+        Quaternion rudderTarget = Quaternion.Euler(0f, phsyics.Yaw * MaxAngle, 0f);
         LeftVerticalStabilizator.transform.localRotation = Quaternion.Slerp(LeftVerticalStabilizator.transform.localRotation, baseLeftVStab * rudderTarget, t);
         RightVerticalStabilizator.transform.localRotation = Quaternion.Slerp(RightVerticalStabilizator.transform.localRotation, baseRightVStab * rudderTarget, t);
         
-        float rollAngle = phsyics.LocalRoll * MaxAngle;
+        float rollAngle = phsyics.Roll * MaxAngle;
         Quaternion leftFlaperonTarget = Quaternion.Euler(rollAngle, 0f, 0f);
         Quaternion rightFlaperonTarget = Quaternion.Euler(-rollAngle, 0f, 0f);
         LeftFlaperon.transform.localRotation = Quaternion.Slerp(LeftFlaperon.transform.localRotation, baseLeftFlaperon * leftFlaperonTarget, t);

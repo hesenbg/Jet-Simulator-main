@@ -19,6 +19,12 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     public Transform LocalTransform;
 
+    [SerializeField] Transform[] SpawnPoints;
+
+    [SerializeField] GameObject SpawnPointParent;
+
+    [SerializeField] int SpawnPointIdex = 0;
+
     public List<Transform> PlayerInstances { get; private set; } = new List<Transform>();
 
     void Fusion.INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
@@ -43,19 +49,25 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         PlayerJoined += OnPlayerJoined;
     }
 
+    private void Start()
+    {
+        SpawnPoints = SpawnPointParent.GetComponentsInChildren<Transform>();
+    }
+
     private void OnPlayerJoined(Transform transform)
     {
         PlayerInstances.Add(transform);
+
+        SpawnPointIdex++;
     }
+
 
     private void Update()
     {
         mouseButton0 = mouseButton0 | Input.GetMouseButton(0);
 
         mouseButton1 = mouseButton1 | Input.GetMouseButton(1);
-
     }
-
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
@@ -67,11 +79,8 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         data.YawRight = Input.GetKey(KeyCode.D);
         data.YawLeft = Input.GetKey(KeyCode.A);
 
-        data.Roll = Input.GetAxis("Mouse X");
-        data.Pitch = Input.GetAxis("Mouse Y");
-
-        if (Input.GetKeyDown(KeyCode.Tab))
-            data.IsMouseLoced = !data.IsMouseLoced;
+        data.Roll = Input.GetAxisRaw("Mouse X");
+        data.Pitch = Input.GetAxisRaw("Mouse Y");
 
         input.Set(data);
     }
@@ -86,8 +95,10 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     {
         if (runner.IsServer)
         {
-            Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 2, 0);
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, SpawnPoints[SpawnPointIdex].position, SpawnPoints[SpawnPointIdex].rotation, player);
+
+            SpawnPointIdex++;
+
             _spawnedCharacters.Add(player, networkPlayerObject);
 
             runner.SetPlayerObject(player, networkPlayerObject);

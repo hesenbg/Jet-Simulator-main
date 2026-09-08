@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/SharedMode.unity
+    guid: 3fc671322b8c79045a99564d7e88432b
+  - enabled: 1
     path: Assets/Scenes/Flight Physics.unity
     guid: 0565bd1a7334ee946a2acc749f0cc26e
   m_configObjects:

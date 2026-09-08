@@ -21,6 +21,14 @@ public class JetParameters : ScriptableObject
     public float YawThreshold;
     public float AirDensity;
     public float WeightAmplifier;
+    public float InputDeadzone;
+
+    [Header("Mounuver Amplifiers")]
+    public float RollAMP;
+    public float PitchAMP;
+    public float YawAMP;
+
+    public float AngularAccel;
 
     [Header("State Thresholds")]
     [Header("Air")]

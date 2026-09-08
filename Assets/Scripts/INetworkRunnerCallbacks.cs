@@ -18,9 +18,5 @@ public struct NetworkInputData : INetworkInput
 
     public float Pitch;
 
-    public float Roll;
-
-    // general
-    public NetworkBool IsMouseLoced;
-    
+    public float Roll;    
 }
