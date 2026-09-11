@@ -2195,7 +2195,7 @@ GameObject:
   - component: {fileID: 8019337219486220967}
   - component: {fileID: 244576043633862620}
   - component: {fileID: 7059714878996966511}
-  - component: {fileID: 7579060119101271641}
+  - component: {fileID: 8211653284726449780}
   m_Layer: 0
   m_Name: JetBody
   m_TagString: Untagged
@@ -2243,7 +2243,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
 --- !u!114 &6389040924234962124
@@ -2263,10 +2263,10 @@ MonoBehaviour:
   HasInput: 0
   currentAngularVelocity: {x: 0, y: 0, z: 0}
   AngularMag: 0
-  LocalThrustInput: 0
-  LocalYaw: 0
-  LocalPitch: 0
-  LocalRoll: 0
+  ThrustInput: 0
+  Yaw: 0
+  Pitch: 0
+  Roll: 0
   Thrust: {x: 0, y: 0, z: 0}
   ThrustMag: 0
   Lift: {x: 0, y: 0, z: 0}
@@ -2363,10 +2363,10 @@ MonoBehaviour:
   Flags: 262402
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 7579060119101271641}
+  - {fileID: 8211653284726449780}
   - {fileID: 6389040924234962124}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &7579060119101271641
+--- !u!114 &8211653284726449780
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

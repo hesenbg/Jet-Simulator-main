@@ -1,7 +1,6 @@
 using Fusion;
 using UnityEngine;
-using UnityEngine.InputSystem;
-
+public enum JetState {  Air, Ground}
 public class JetPhysics : NetworkBehaviour
 {
     [Header("Components")]
@@ -14,8 +13,6 @@ public class JetPhysics : NetworkBehaviour
     [Header("Inputs")]
 
     public bool HasInput;
-        
-
 
     [Header("Debug - Networked Values")]
 

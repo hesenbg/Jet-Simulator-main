@@ -17,9 +17,7 @@ public class Radar : MonoBehaviour
 
     private void Start()
     {
-        Spawner.Instance.PlayerLeft += OnPlayerLeft;
 
-        Spawner.Instance.PlayerJoined += OnPlayerJoined;
     }
 
     private void OnPlayerLeft(Transform transform)
@@ -47,20 +45,20 @@ public class Radar : MonoBehaviour
 
     private void UpdateJetIcons()
     {
-        Transform local = Spawner.Instance.LocalTransform;
-        foreach (Transform tr in Spawner.Instance.PlayerInstances)
-        {
-            RectTransform rt = JetIcons[tr];
-            Vector2 offset = new Vector2(
-                (tr.position.x - local.position.x) / Scale,
-                (tr.position.z - local.position.z) / Scale
-            );
-            if (offset.magnitude > MaxDistanceBetweenIcons)
-                offset = offset.normalized * MaxDistanceBetweenIcons;
-
-            rt.localPosition = offset;
-            rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y);
-            rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y + AngleOffset);
-        }
+        //Transform local = Spawner.Instance.LocalTransform;
+        //foreach (Transform tr in Spawner.Instance.PlayerInstances)
+        //{
+        //    RectTransform rt = JetIcons[tr];
+        //    Vector2 offset = new Vector2(
+        //        (tr.position.x - local.position.x) / Scale,
+        //        (tr.position.z - local.position.z) / Scale
+        //    );
+        //    if (offset.magnitude > MaxDistanceBetweenIcons)
+        //        offset = offset.normalized * MaxDistanceBetweenIcons;
+        //
+        //    rt.localPosition = offset;
+        //    rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y);
+        //    rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y + AngleOffset);
+        //}
     }
 }
