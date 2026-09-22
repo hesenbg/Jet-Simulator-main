@@ -1,60 +1,78 @@
-using System;
-using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
+using System;
+using System.Collections.Generic;
+using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 {
-    [SerializeField] private NetworkPrefabRef _playerPrefab;
+    [SerializeField] private NetworkPrefabRef playerPrefab;
     private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
-    public Action<Transform> PlayerJoined;
-    public Action<Transform> PlayerLeft;
+    [Header("Events")]
 
-    public Transform LocalTransform;
+    public Action<Transform> LocalPlayerJoined;
 
-    [SerializeField] Transform[] SpawnPoints;
-    [SerializeField] GameObject SpawnPointParent;
-
-    [SerializeField] GameSessionUiLogic SessionUI;
-
-    public List<Transform> PlayerInstances { get; private set; } = new List<Transform>();
-
-    private NetworkRunner _runner;
+    public Action LocalPlayerLeft;
 
     public Action<List<SessionInfo>> OnSessionListUpdated;
 
+    [Header("Instances")]
+    public Transform LocalPlayerTransform;
+
+    [SerializeField] Transform[] SpawnPoints;
+
+    [SerializeField] GameObject SpawnPointParent;
+
+
+    private NetworkRunner _runner;
+
+    private List<SessionInfo> Sessions = new List<SessionInfo>();
+
+
+
     private void Awake()
     {
-        PlayerJoined += OnPlayerJoined;
+    }
+
+    private void OnDestroy()
+    {  
+
+        if (_runner != null)
+        {
+            _runner.RemoveCallbacks(this);
+        }
     }
 
     private void Start()
     {
         if (SpawnPointParent != null)
         {
-            SpawnPoints = SpawnPointParent.GetComponentsInChildren<Transform>();
+            var children = new List<Transform>();
+            foreach (Transform child in SpawnPointParent.transform)
+                children.Add(child);
+            SpawnPoints = children.ToArray();
         }
 
         JoinSessionList();
     }
 
-    private void OnPlayerJoined(Transform transform)
-    {
-        PlayerInstances.Add(transform);
-    }
 
-    public async void JoinSessionList()
+    private void EnsureRunner()
     {
         if (_runner == null)
         {
             _runner = gameObject.AddComponent<NetworkRunner>();
             _runner.ProvideInput = true;
+            _runner.AddCallbacks(this);
         }
+    }
 
-        _runner.AddCallbacks(this);
+    public async void JoinSessionList()
+    {
+        EnsureRunner();
 
         var result = await _runner.JoinSessionLobby(SessionLobby.Shared);
         if (!result.Ok)
@@ -65,34 +83,38 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     public async void CreateSession(string roomName)
     {
-        if (_runner == null)
+        if (Sessions.Exists(s => s.Name == roomName))
         {
-            _runner = gameObject.AddComponent<NetworkRunner>();
-            _runner.ProvideInput = true;
+            Debug.LogError($"Session '{roomName}' already exists");
+            return;
         }
 
-        _runner.AddCallbacks(this);
+        EnsureRunner();
 
         var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
+        var sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
 
-        await _runner.StartGame(new StartGameArgs()
+        var result = await _runner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = roomName,
             Scene = scene,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = sceneManager
         });
+
+        if (!result.Ok)
+        {
+            Debug.LogError($"Failed to create session: {result.ShutdownReason}");
+            Destroy(sceneManager);
+            Destroy(_runner);
+            _runner = null;
+            JoinSessionList();
+        }
     }
 
     public async void JoinSession(string roomName)
     {
-        if (_runner == null)
-        {
-            _runner = gameObject.AddComponent<NetworkRunner>();
-            _runner.ProvideInput = true;
-        }
-
-        _runner.AddCallbacks(this);
+        EnsureRunner();
 
         var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
 
@@ -107,23 +129,22 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     void Fusion.INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
-        Debug.Log("list updated");
+        Sessions = sessionList;
         OnSessionListUpdated?.Invoke(sessionList);
     }
 
     void Fusion.INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
+
         if (player == runner.LocalPlayer)
         {
-
-            SessionUI.DisableUI();
 
             int spawnIndex = SpawnPoints != null && SpawnPoints.Length > 0 ? player.PlayerId % SpawnPoints.Length : 0;
             Vector3 position = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].position : Vector3.zero;
             Quaternion rotation = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].rotation : Quaternion.identity;
 
             NetworkObject networkPlayerObject = runner.Spawn(
-                _playerPrefab,
+                playerPrefab,
                 position,
                 rotation,
                 player);
@@ -137,22 +158,25 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
                 rb.angularVelocity = Vector3.zero;
             }
 
+            LocalPlayerTransform = networkPlayerObject.transform;
+            LocalPlayerJoined?.Invoke(LocalPlayerTransform);
+
             spawnedCharacters.Add(player, networkPlayerObject);
             runner.SetPlayerObject(player, networkPlayerObject);
-            PlayerJoined?.Invoke(networkPlayerObject.transform);
         }
     }
 
     void Fusion.INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-
-        SessionUI.EnableUI();
-
         if (spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
         {
             runner.Despawn(networkObject);
             spawnedCharacters.Remove(player);
-            PlayerLeft?.Invoke(networkObject.transform);
+
+            if (player == runner.LocalPlayer)
+            {
+                LocalPlayerLeft?.Invoke();
+            }
         }
     }
 

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -34,7 +35,17 @@ public class JetData : MonoBehaviour
         Physics = GetComponent<JetPhysics>();
 
         CurrentTimeBetweenChanges = 0;
+
     }
+
+    public float GetThrust()
+    {
+        return Physics.ThrustInput;
+    }
+
+    public float GetRollValue => Physics.Roll;
+
+    public float GetPitchValue => Physics.Pitch;
 
     private void Update()
     {

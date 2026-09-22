@@ -117,7 +117,7 @@ MonoBehaviour:
   PitchAMP: 6
   YawAMP: 0.7
   AngularAccel: 5
-  AirThresholdDistance: 2
+  AirThresholdDistance: 3
   AirThrustThreshold: 0.5
   AirIncreaseRate: 0.8
   AirBaseDragCoefficient: 0.5
