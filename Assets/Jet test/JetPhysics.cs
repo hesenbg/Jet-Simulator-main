@@ -1,28 +1,31 @@
 using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
-
+public enum JetState {  Air, Ground}
 public class JetPhysics : NetworkBehaviour
 {
     [Header("Components")]
     public Rigidbody rb { get; private set; }
+    [SerializeField] GameObject MeshObject;
 
     [Header("Parameters")]
     [SerializeField] JetParameters Data;
 
     [Header("Inputs")]
-    [Networked] float ThrustInput { get; set; }
-    [Networked] float Yaw { get; set; }
-    [Networked] float Roll { get; set; }
-    [Networked] float Pitch { get; set; }
+
+    public bool HasInput;
 
     [Header("Debug - Networked Values")]
-    public float LocalThrustInput;
-    public float LocalYaw;
-    public float LocalPitch;
-    public float LocalRoll;
 
-    [Header("Forces")]
+    public Vector3 currentAngularVelocity;
+
+    public float AngularMag;
+
+    [Networked] public float ThrustInput {set; get; }
+    [Networked] public float Yaw { set; get; }
+    [Networked] public float Pitch { set; get; }
+    [Networked] public float Roll { set; get; }
+     
+    [Header("Vectors")]
     [SerializeField] Vector3 Thrust;
     [SerializeField] float ThrustMag;
     [SerializeField] Vector3 Lift;
@@ -38,12 +41,14 @@ public class JetPhysics : NetworkBehaviour
 
     [Header("Runtime Working Values")]
     public float ThrustMinThreshold;
-    public float IncreaseRate {  get; private set; }
+    public float IncreaseRate { get; private set; }
     float LiftAOA_0;
     float DragAOA_0;
 
     [Header("State machine")]
     public JetState State;
+
+    bool mouseLocked = true;
 
     private void Start()
     {
@@ -51,14 +56,17 @@ public class JetPhysics : NetworkBehaviour
 
         AOA = 0f;
 
-        if (!Object.HasInputAuthority)
+        if (!HasStateAuthority)
             return;
 
-        JetCameraController  controller = Camera.main.gameObject.GetComponent<JetCameraController>();
+        JetCameraController controller = Camera.main.gameObject.GetComponent<JetCameraController>();
 
         controller.jetTarget = transform;
 
         controller.PlaceCamera();
+
+        Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !mouseLocked;
     }
 
     private void Update()
@@ -66,58 +74,88 @@ public class JetPhysics : NetworkBehaviour
         ThrustMag = Thrust.magnitude;
         LiftMag = Lift.magnitude;
         DragMag = Drag.magnitude;
+
+        currentAngularVelocity = rb.angularVelocity;
+
+        AngularMag = rb.angularVelocity.magnitude;
+
+        if (HasStateAuthority)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            mouseLocked = !mouseLocked;
+
+            Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !mouseLocked;
+        }
     }
 
+    public override void Spawned()
+    {
+        GameEvent_Data.Instance.AddPlayerInstance(transform);
+
+        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform);
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform);
+    }
 
     public override void FixedUpdateNetwork()
     {
-        if (GetInput(out NetworkInputData data))
+        float dt = Runner.DeltaTime;
+
+        if (HasStateAuthority)
         {
-            float dt = Runner.DeltaTime;
-
-            if (data.ThrustUp)
-                ThrustInput += dt * IncreaseRate;
-            else if (data.ThrustDown)
-                ThrustInput -= dt * IncreaseRate;
+            // thrust
+            if (Input.GetKey(KeyCode.W))
+            {
+                ThrustInput += IncreaseRate * dt;
+            }
+            else if (Input.GetKey(KeyCode.S))
+            {
+                ThrustInput -= IncreaseRate * dt;
+            }
             else
-                ThrustInput = Mathf.Lerp(ThrustInput, ThrustMinThreshold, dt * IncreaseRate);
-
+            {
+                ThrustInput = Mathf.MoveTowards(ThrustInput, ThrustMinThreshold, IncreaseRate * dt);
+            }
             ThrustInput = Mathf.Clamp01(ThrustInput);
 
-            if (data.YawRight)
-                Yaw += dt * IncreaseRate;
-            else if (data.YawLeft)
-                Yaw -= dt * IncreaseRate;
+            // yaw
+            if (Input.GetKey(KeyCode.D))
+                Yaw += IncreaseRate * dt;
+            else if (Input.GetKey(KeyCode.A))
+                Yaw -= IncreaseRate * dt;
             else
-                Yaw = Mathf.MoveTowards(Yaw, 0f, dt * IncreaseRate);
-            Yaw = Mathf.Clamp(Yaw, -1f, 1f);
-
-            Roll = data.Roll;
-            Pitch = data.Pitch;
-
-            LocalThrustInput = ThrustInput;
-            LocalYaw = Yaw;
-            LocalPitch = Pitch;
-            LocalRoll = Roll;
-
-            if (!Object.HasInputAuthority)
             {
-                Cursor.lockState = data.IsMouseLoced ? CursorLockMode.None : CursorLockMode.Locked;
-                Cursor.visible = data.IsMouseLoced;
+                Yaw = Mathf.MoveTowards(Yaw, 0,IncreaseRate * dt);
             }
 
-            Cursor.lockState = data.IsMouseLoced ? CursorLockMode.None : CursorLockMode.Locked;
-            Cursor.visible = data.IsMouseLoced;
+            Yaw = Mathf.Clamp(Yaw, -Data.YawThreshold, Data.YawThreshold);
+
+            // others
+            Roll = Input.GetAxisRaw("Mouse X");
+
+
+            Pitch = Input.GetAxisRaw("Mouse Y");
+        }
+        
+
+        if (rb != null)
+        {
+            CalculateThrustForce();
+            CalculateDragForce();
+            CalculateLiftForce();
+            ClampSpeed();
+            CalculateAOA();
+            Weight();
+            ApplyManeuver();
         }
 
         StateMachine();
-        CalculateThrustForce();
-        CalculateDragForce();
-        CalculateLiftForce();
-        ClampSpeed();
-        ApplyManeuver();
-        CalculateAOA();
-        Weight();
     }
 
     private void StateMachine()
@@ -157,18 +195,19 @@ public class JetPhysics : NetworkBehaviour
 
     private void ApplyManeuver()
     {
-        rb.AddTorque(transform.up * Yaw);
+        Vector3 accelerationTorque =
+            transform.up * Yaw * Data.YawAMP +
+            transform.right * Pitch * Data.PitchAMP +
+            transform.forward * Roll * Data.RollAMP;
 
-        rb.AddTorque(transform.right * Pitch);
-
-        rb.AddTorque(transform.forward * Roll);
+        rb.AddTorque(accelerationTorque, ForceMode.Acceleration);
     }
 
     private void CalculateAOA()
     {
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
         {
-            AOA = Vector3.Angle(transform.forward, rb.linearVelocity.normalized) / 90f;
+            AOA = Vector3.Angle(transform.forward, Thrust) / 90f;
         }
 
         LiftCoefficient = Data.LiftCoefficientCurve.Evaluate(AOA) + LiftAOA_0;

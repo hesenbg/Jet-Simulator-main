@@ -112,7 +112,12 @@ MonoBehaviour:
   YawThreshold: 1
   AirDensity: 1
   WeightAmplifier: 5
-  AirThresholdDistance: 2
+  InputDeadzone: 0.07
+  RollAMP: 4.5
+  PitchAMP: 6
+  YawAMP: 0.7
+  AngularAccel: 5
+  AirThresholdDistance: 3
   AirThrustThreshold: 0.5
   AirIncreaseRate: 0.8
   AirBaseDragCoefficient: 0.5
