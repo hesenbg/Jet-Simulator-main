@@ -1,11 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class JetData : MonoBehaviour
 {
-    public float JetAltitute;
+    float JetAltitute;
 
-    public float GForce;
+    float GForce;
 
     public float GForceMultipiler;
 
@@ -29,26 +30,25 @@ public class JetData : MonoBehaviour
 
     public float InterpolationSpeed;
 
+    [SerializeField] float BaseMinYlevel;
+
+    [SerializeField] bool IsEnabled = true;
+
     private void Start()
     {
         Physics = GetComponent<JetPhysics>();
 
         CurrentTimeBetweenChanges = 0;
+
+        if (Physics.HasStateAuthority)
+        {
+            GForcePostProccesing = GameEvent_Data.Instance.GetGForceVolume;
+        }
+        else
+        {
+            IsEnabled = false;
+        }
     }
-
-    private void Update()
-    {
-        CurrentSpeed = Physics.rb.linearVelocity;
-
-        CurrentAOA = Physics.AOA;
-
-        CalculateGForce();
-
-        CalculateChanges();
-
-        CalculateAltitute();
-    }
-
     private void CalculateChanges()
     {
         if (CurrentTimeBetweenChanges < TimeBetweenChanges)
@@ -69,17 +69,42 @@ public class JetData : MonoBehaviour
         }
     }
 
-    private void CalculateAltitute()
-    {
-        JetAltitute = transform.position.y;
-    }
 
+
+
+
+    private void Update()
+    {
+
+        if (!IsEnabled)
+            return;
+        CurrentSpeed = Physics.rb.linearVelocity;
+
+        CurrentAOA = Physics.AOA;
+
+        CalculateGForce();
+
+        CalculateChanges();
+
+    }
 
     private void CalculateGForce()
     {
         float acceleration = SpeedChangeAmount.magnitude / TimeBetweenChanges;
         GForce = (acceleration / 10f) + 1f;
 
-        //GForcePostProccesing.weight = Mathf.Lerp(GForcePostProccesing.weight, GForce / 10f, InterpolationSpeed * Time.deltaTime);
+        GForcePostProccesing.weight = Mathf.Lerp(GForcePostProccesing.weight, GForce / 10f, InterpolationSpeed * Time.deltaTime);
     }
+
+    public float GetSpeed => Physics.rb.linearVelocity.magnitude;
+
+    public float GetGForce => GForce;
+
+    public float GetAltitute => transform.position.y - BaseMinYlevel;
+
+    public float GetThrust => Physics.ThrustInput;
+
+    public float GetRollValue => Physics.Roll;
+
+    public float GetPitchValue => Physics.Pitch;
 }

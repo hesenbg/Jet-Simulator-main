@@ -20,12 +20,12 @@ public class JetPhysics : NetworkBehaviour
 
     public float AngularMag;
 
-    public float ThrustInput;
-    public float Yaw;
-    public float Pitch;
-    public float Roll;
-
-    [Header("Forces")]
+    [Networked] public float ThrustInput {set; get; }
+    [Networked] public float Yaw { set; get; }
+    [Networked] public float Pitch { set; get; }
+    [Networked] public float Roll { set; get; }
+     
+    [Header("Vectors")]
     [SerializeField] Vector3 Thrust;
     [SerializeField] float ThrustMag;
     [SerializeField] Vector3 Lift;
@@ -79,7 +79,6 @@ public class JetPhysics : NetworkBehaviour
 
         AngularMag = rb.angularVelocity.magnitude;
 
-
         if (HasStateAuthority)
             return;
 
@@ -90,6 +89,18 @@ public class JetPhysics : NetworkBehaviour
             Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !mouseLocked;
         }
+    }
+
+    public override void Spawned()
+    {
+        GameEvent_Data.Instance.AddPlayerInstance(transform);
+
+        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform);
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform);
     }
 
     public override void FixedUpdateNetwork()
@@ -126,10 +137,10 @@ public class JetPhysics : NetworkBehaviour
             Yaw = Mathf.Clamp(Yaw, -Data.YawThreshold, Data.YawThreshold);
 
             // others
-            Roll = Input.GetAxis("Mouse X");
+            Roll = Input.GetAxisRaw("Mouse X");
 
 
-            Pitch = Input.GetAxis("Mouse Y");
+            Pitch = Input.GetAxisRaw("Mouse Y");
         }
         
 
@@ -196,7 +207,7 @@ public class JetPhysics : NetworkBehaviour
     {
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
         {
-            AOA = Vector3.Angle(transform.forward, rb.linearVelocity.normalized) / 90f;
+            AOA = Vector3.Angle(transform.forward, Thrust) / 90f;
         }
 
         LiftCoefficient = Data.LiftCoefficientCurve.Evaluate(AOA) + LiftAOA_0;

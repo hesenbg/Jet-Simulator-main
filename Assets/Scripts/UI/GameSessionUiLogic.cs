@@ -11,6 +11,8 @@ public class GameSessionUiLogic : MonoBehaviour
 
     [SerializeField] private float HeightDifferenceBetweenSessionUI = 60f;
 
+    [SerializeField] string SessionName;
+
     private void Start()
     {
         if (NetworkSpawner != null)
@@ -37,17 +39,23 @@ public class GameSessionUiLogic : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void AddNewSession(string SessionName)
+
+    public void CreateSession()
     {
-        if (string.IsNullOrWhiteSpace(SessionName))
+        NetworkSpawner.CreateSession(SessionName);
+    }
+
+    public void AddNewSession(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
         {
             Debug.LogWarning("Session name cannot be empty.");
             return;
         }
 
-        NetworkSpawner.CreateSession(SessionName);
+        SessionName = name;
     }
-
+ 
     public void RefreshSessionUIlist(List<SessionInfo> list)
     {
         foreach (Transform child in SessionUI_Parent)
