@@ -2,6 +2,7 @@ using Fusion;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 public class GameEvent_Data : MonoBehaviour
 {
     public static GameEvent_Data Instance;
@@ -12,6 +13,10 @@ public class GameEvent_Data : MonoBehaviour
 
     [Header("Components")]
     [SerializeField] Spawner NetworkSpawner;
+
+    [SerializeField] Volume GForcePostProcces;
+
+    public JetData LocalPlayerParams {  get; private set; }
 
     [Header("Data")]
     public Transform LocalPlayer;
@@ -29,6 +34,15 @@ public class GameEvent_Data : MonoBehaviour
 
     public Action<List<SessionInfo>> OnSessionListUpdated;
 
+
+    public bool IsStateAthority(Transform player)
+    {
+        return player == LocalPlayer;
+    }
+
+    public Volume GetGForceVolume => GForcePostProcces;
+
+
     public void AddPlayerInstance(Transform player)
     {
         PlayerInstances.Add(player);
@@ -37,6 +51,8 @@ public class GameEvent_Data : MonoBehaviour
     public void AddLocalPlayerInstance(Transform Local)
     {
         LocalPlayer = Local;
+
+        LocalPlayerParams = Local.gameObject.GetComponent<JetData>();
     }
 
     private void Start()

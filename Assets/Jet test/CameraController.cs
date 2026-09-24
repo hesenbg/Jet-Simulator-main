@@ -12,7 +12,7 @@ public class JetCameraController : MonoBehaviour
 
     [Header("Rotation Follow Speed")]
     [SerializeField] float rotationDamping = 10f;
-
+    [SerializeField] float SOD_PosInterpolationSpeed;
     SODState posSodState;
 
     public void PlaceCamera()
@@ -47,9 +47,8 @@ public class JetCameraController : MonoBehaviour
 
         Vector3 targetPosition = jetTarget.position + (Quaternion.Euler(targetEuler) * offset);
 
-        transform.position = targetPosition;
+        transform.position = SOD.SODUpdate(ref posSodState, Time.deltaTime * SOD_PosInterpolationSpeed, targetPosition);
     }
-
 
     private void OnValidate()
     {

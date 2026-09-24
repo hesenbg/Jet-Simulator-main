@@ -40,7 +40,7 @@ public class JetSoundLogic : MonoBehaviour
 
     private void Update()
     {
-        EngineThrust.volume = data.GetThrust()*MaxEngineThrustValue;
+        EngineThrust.volume = data.GetThrust*MaxEngineThrustValue;
         
         //EngineThrust.pitch = Mathf.Lerp(EngineThrust.pitch, EngineBasePitch +)
 

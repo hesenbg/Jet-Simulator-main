@@ -207,7 +207,7 @@ public class JetPhysics : NetworkBehaviour
     {
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
         {
-            AOA = Vector3.Angle(transform.forward, rb.linearVelocity.normalized) / 90f;
+            AOA = Vector3.Angle(transform.forward, Thrust) / 90f;
         }
 
         LiftCoefficient = Data.LiftCoefficientCurve.Evaluate(AOA) + LiftAOA_0;
