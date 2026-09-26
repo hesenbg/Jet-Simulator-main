@@ -96,6 +96,7 @@ public class JetPhysics : NetworkBehaviour
         GameEvent_Data.Instance.AddPlayerInstance(transform);
 
         GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform);
+
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)

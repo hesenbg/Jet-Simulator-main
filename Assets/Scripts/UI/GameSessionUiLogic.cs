@@ -1,4 +1,5 @@
 using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +7,9 @@ using UnityEngine.UI;
 public class GameSessionUiLogic : MonoBehaviour
 {
     [SerializeField] private GameObject SessionUIPrefab;
+
     [SerializeField] private Transform SessionUI_Parent;
+
     [SerializeField] private Spawner NetworkSpawner;
 
     [SerializeField] private float HeightDifferenceBetweenSessionUI = 60f;
@@ -39,9 +42,14 @@ public class GameSessionUiLogic : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-
     public void CreateSession()
     {
+        StartCoroutine(CreateSessionDelayed());
+    }
+
+    private IEnumerator CreateSessionDelayed()
+    {
+        yield return new WaitForSeconds(3f);
         NetworkSpawner.CreateSession(SessionName);
     }
 
@@ -55,7 +63,7 @@ public class GameSessionUiLogic : MonoBehaviour
 
         SessionName = name;
     }
- 
+
     public void RefreshSessionUIlist(List<SessionInfo> list)
     {
         foreach (Transform child in SessionUI_Parent)

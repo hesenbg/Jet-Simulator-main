@@ -2528,6 +2528,7 @@ GameObject:
   - component: {fileID: 7059714878996966511}
   - component: {fileID: 8211653284726449780}
   - component: {fileID: 4151384497685826937}
+  - component: {fileID: 2809577701084127129}
   m_Layer: 0
   m_Name: JetBody
   m_TagString: Untagged
@@ -2644,8 +2645,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de67345d5960941498d740e5a9362097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JetData
-  JetAltitute: 0
-  GForce: 0
   GForceMultipiler: 2
   CurrentSpeed: {x: 0, y: 0, z: 0}
   CurrentAOA: 0
@@ -2657,6 +2656,8 @@ MonoBehaviour:
   AOAChangeAmount: 0
   GForcePostProccesing: {fileID: 0}
   InterpolationSpeed: 2
+  BaseMinYlevel: 0
+  IsEnabled: 1
 --- !u!65 &244576043633862620
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2759,8 +2760,21 @@ MonoBehaviour:
   data: {fileID: 8019337219486220967}
   MaxEngineThrustValue: 0.2
   EngineBasePitch: 0
-  MonuverMinPitch: 1.6
+  MonuverPitchEffectivness: 0
+  MonuverRollEffectivness: 0
   InterpolationSpeed: 6
+--- !u!114 &2809577701084127129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6508180871996175977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2c244bd7f95924197b610f97da2fab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkedPlayer
 --- !u!1 &6515024354471409445
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,6 +22,8 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     [Header("Instances")]
     public Transform LocalPlayerTransform;
 
+    private PlayerRef LocalPlayerRef;
+
     [SerializeField] Transform[] SpawnPoints;
 
     [SerializeField] GameObject SpawnPointParent;
@@ -38,7 +40,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     }
 
     private void OnDestroy()
-    {  
+    {
 
         if (_runner != null)
         {
@@ -127,6 +129,36 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         });
     }
 
+    public void SpawnPlayer()
+    {
+        if (_runner == null || LocalPlayerRef != _runner.LocalPlayer) return;
+
+        int spawnIndex = SpawnPoints != null && SpawnPoints.Length > 0 ? LocalPlayerRef.PlayerId % SpawnPoints.Length : 0;
+        Vector3 position = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].position : Vector3.zero;
+        Quaternion rotation = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].rotation : Quaternion.identity;
+
+        NetworkObject networkPlayerObject = _runner.Spawn(
+            playerPrefab,
+            position,
+            rotation,
+            LocalPlayerRef);
+
+        var rb = networkPlayerObject.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.position = position;
+            rb.rotation = rotation;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        LocalPlayerTransform = networkPlayerObject.transform;
+        LocalPlayerJoined?.Invoke(LocalPlayerTransform);
+
+        spawnedCharacters.Add(LocalPlayerRef, networkPlayerObject);
+        _runner.SetPlayerObject(LocalPlayerRef, networkPlayerObject);
+    }
+
     void Fusion.INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         Sessions = sessionList;
@@ -135,35 +167,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     void Fusion.INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-
-        if (player == runner.LocalPlayer)
-        {
-
-            int spawnIndex = SpawnPoints != null && SpawnPoints.Length > 0 ? player.PlayerId % SpawnPoints.Length : 0;
-            Vector3 position = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].position : Vector3.zero;
-            Quaternion rotation = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].rotation : Quaternion.identity;
-
-            NetworkObject networkPlayerObject = runner.Spawn(
-                playerPrefab,
-                position,
-                rotation,
-                player);
-
-            var rb = networkPlayerObject.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.position = position;
-                rb.rotation = rotation;
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
-
-            LocalPlayerTransform = networkPlayerObject.transform;
-            LocalPlayerJoined?.Invoke(LocalPlayerTransform);
-
-            spawnedCharacters.Add(player, networkPlayerObject);
-            runner.SetPlayerObject(player, networkPlayerObject);
-        }
+        LocalPlayerRef = player;
     }
 
     void Fusion.INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
