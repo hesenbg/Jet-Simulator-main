@@ -22,8 +22,6 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     [Header("Instances")]
     public Transform LocalPlayerTransform;
 
-    private PlayerRef LocalPlayerRef;
-
     [SerializeField] Transform[] SpawnPoints;
 
     [SerializeField] GameObject SpawnPointParent;
@@ -129,11 +127,11 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         });
     }
 
-    public void SpawnPlayer()
+    public void SpawnPlayer(PlayerRef player)
     {
-        if (_runner == null || LocalPlayerRef != _runner.LocalPlayer) return;
+        if (_runner == null || player != _runner.LocalPlayer) return;
 
-        int spawnIndex = SpawnPoints != null && SpawnPoints.Length > 0 ? LocalPlayerRef.PlayerId % SpawnPoints.Length : 0;
+        int spawnIndex = SpawnPoints != null && SpawnPoints.Length > 0 ? player.PlayerId % SpawnPoints.Length : 0;
         Vector3 position = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].position : Vector3.zero;
         Quaternion rotation = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].rotation : Quaternion.identity;
 
@@ -141,7 +139,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
             playerPrefab,
             position,
             rotation,
-            LocalPlayerRef);
+            player);
 
         var rb = networkPlayerObject.GetComponent<Rigidbody>();
         if (rb != null)
@@ -155,8 +153,8 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         LocalPlayerTransform = networkPlayerObject.transform;
         LocalPlayerJoined?.Invoke(LocalPlayerTransform);
 
-        spawnedCharacters.Add(LocalPlayerRef, networkPlayerObject);
-        _runner.SetPlayerObject(LocalPlayerRef, networkPlayerObject);
+        spawnedCharacters.Add(player, networkPlayerObject);
+        _runner.SetPlayerObject(player, networkPlayerObject);
     }
 
     void Fusion.INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
@@ -167,7 +165,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     void Fusion.INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        LocalPlayerRef = player;
+        SpawnPlayer(player);
     }
 
     void Fusion.INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)

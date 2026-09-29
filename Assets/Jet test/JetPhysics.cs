@@ -50,6 +50,8 @@ public class JetPhysics : NetworkBehaviour
 
     bool mouseLocked = true;
 
+    NetworkedPlayer player;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -63,10 +65,10 @@ public class JetPhysics : NetworkBehaviour
 
         controller.jetTarget = transform;
 
-        controller.PlaceCamera();
+        player = gameObject.GetComponent<NetworkedPlayer>();
 
-        Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !mouseLocked;
+
+        controller.PlaceCamera();
     }
 
     private void Update()
@@ -78,17 +80,6 @@ public class JetPhysics : NetworkBehaviour
         currentAngularVelocity = rb.angularVelocity;
 
         AngularMag = rb.angularVelocity.magnitude;
-
-        if (HasStateAuthority)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            mouseLocked = !mouseLocked;
-
-            Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !mouseLocked;
-        }
     }
 
     public override void Spawned()
@@ -96,6 +87,7 @@ public class JetPhysics : NetworkBehaviour
         GameEvent_Data.Instance.AddPlayerInstance(transform);
 
         GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform);
+
 
     }
 
@@ -108,42 +100,19 @@ public class JetPhysics : NetworkBehaviour
     {
         float dt = Runner.DeltaTime;
 
+        Debug.Log(Runner.SessionInfo.Region);
+
+
         if (HasStateAuthority)
         {
-            // thrust
-            if (Input.GetKey(KeyCode.W))
-            {
-                ThrustInput += IncreaseRate * dt;
-            }
-            else if (Input.GetKey(KeyCode.S))
-            {
-                ThrustInput -= IncreaseRate * dt;
-            }
-            else
-            {
-                ThrustInput = Mathf.MoveTowards(ThrustInput, ThrustMinThreshold, IncreaseRate * dt);
-            }
-            ThrustInput = Mathf.Clamp01(ThrustInput);
+            InputManager.instance.GetJetPhysicsInput(IncreaseRate, dt, ThrustInput, Yaw, Data.YawThreshold,
+                out float thrustInput, out float yaw, out float roll, out float pitch);
 
-            // yaw
-            if (Input.GetKey(KeyCode.D))
-                Yaw += IncreaseRate * dt;
-            else if (Input.GetKey(KeyCode.A))
-                Yaw -= IncreaseRate * dt;
-            else
-            {
-                Yaw = Mathf.MoveTowards(Yaw, 0,IncreaseRate * dt);
-            }
-
-            Yaw = Mathf.Clamp(Yaw, -Data.YawThreshold, Data.YawThreshold);
-
-            // others
-            Roll = Input.GetAxisRaw("Mouse X");
-
-
-            Pitch = Input.GetAxisRaw("Mouse Y");
+            ThrustInput = thrustInput;
+            Yaw = yaw;
+            Roll = roll;
+            Pitch = pitch;
         }
-        
 
         if (rb != null)
         {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public enum Side { Red, BLue, Neutral}
+public enum Side { Red, Blue, Neutral}
 
 public class GameEvent_Data : MonoBehaviour
 {
@@ -21,12 +21,12 @@ public class GameEvent_Data : MonoBehaviour
 
     public JetData LocalPlayerParams {  get; private set; }
 
-    public NetworkedPlayer LocalNetworkedPlayer { get; set; }
-
     [Header("Data")]
     public Transform LocalPlayer;
 
     public List<Transform> PlayerInstances;
+
+    public  GamePhase CurrentPhase;
 
     [Header("Events")]
     public Action<Transform> OnLocalPlayerJoined;
@@ -41,14 +41,31 @@ public class GameEvent_Data : MonoBehaviour
 
     public Volume GetGForceVolume => GForcePostProcces;
 
-    public void SpawnLocalPlayer()
-    {
-        NetworkSpawner.SpawnPlayer();
-    }
 
     public void AddPlayerInstance(Transform player)
     {
         PlayerInstances.Add(player);
+    }
+
+
+    public NetworkedPlayer GetLocalNetworkedPlayer()
+    {
+        LocalPlayer.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
+
+        return player;
+    }
+
+    public bool CheckReadyAll()
+    {
+        foreach(Transform player in PlayerInstances)
+        {
+            if(player.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer Networked))
+            {
+                if(!Networked.IsReady)
+                    return false;
+            }
+        }
+        return true;
     }
 
     public void AddLocalPlayerInstance(Transform Local)

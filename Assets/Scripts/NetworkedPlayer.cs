@@ -1,7 +1,9 @@
 using Fusion;
 public class NetworkedPlayer : NetworkBehaviour
 {
-    public Side PlayerSide { get;  set; }
-    public bool IsReady { get; }
-    public string PlayerName { get; private set; }
+    [Networked] public Side PlayerSide { get; set; }
+
+    [Networked] public string PlayerName { get; set; }
+
+    [Networked] public bool IsReady { get; set; }
 }

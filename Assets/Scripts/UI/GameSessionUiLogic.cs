@@ -16,6 +16,8 @@ public class GameSessionUiLogic : MonoBehaviour
 
     [SerializeField] string SessionName;
 
+    [SerializeField] string PlayerName;
+    
     private void Start()
     {
         if (NetworkSpawner != null)
@@ -30,6 +32,12 @@ public class GameSessionUiLogic : MonoBehaviour
         {
             NetworkSpawner.OnSessionListUpdated -= RefreshSessionUIlist;
         }
+    }
+
+    public void AddPlayerName(string Name)
+    {
+        PlayerName = Name;
+        GameEvent_Data.Instance.GetLocalNetworkedPlayer().PlayerName = Name;
     }
 
     public void EnableUI()
