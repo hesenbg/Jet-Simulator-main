@@ -59,6 +59,16 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         JoinSessionList();
     }
 
+    public void SetLocalPlayerTransform(Transform local)
+    {
+        LocalPlayerTransform = local;
+    }
+
+    public Transform GetLocalTransform()
+    {
+        return LocalPlayerTransform;
+    }
+
 
     private void EnsureRunner()
     {
@@ -151,7 +161,6 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         }
 
         LocalPlayerTransform = networkPlayerObject.transform;
-        LocalPlayerJoined?.Invoke(LocalPlayerTransform);
 
         spawnedCharacters.Add(player, networkPlayerObject);
         _runner.SetPlayerObject(player, networkPlayerObject);

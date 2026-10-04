@@ -1,4 +1,5 @@
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,16 +15,28 @@ public class GameSessionUiLogic : MonoBehaviour
 
     [SerializeField] private float HeightDifferenceBetweenSessionUI = 60f;
 
+    [SerializeField] private Canvas canvas;
+
     [SerializeField] string SessionName;
 
     [SerializeField] string PlayerName;
     
     private void Start()
     {
+
+        GameEvent_Data.Instance.OnLocalPlayerJoined += OnJoined;
+
         if (NetworkSpawner != null)
         {
             NetworkSpawner.OnSessionListUpdated += RefreshSessionUIlist;
         }
+    }
+
+    private void OnJoined(Transform transform)
+    {
+        transform.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
+
+        player.PlayerName = PlayerName;
     }
 
     private void OnDestroy()
@@ -37,17 +50,16 @@ public class GameSessionUiLogic : MonoBehaviour
     public void AddPlayerName(string Name)
     {
         PlayerName = Name;
-        GameEvent_Data.Instance.GetLocalNetworkedPlayer().PlayerName = Name;
     }
 
     public void EnableUI()
     {
-        gameObject.SetActive(true);
+        canvas.gameObject.SetActive(true);
     }
 
     public void DisableUI()
     {
-        gameObject.SetActive(false);
+        canvas.gameObject.SetActive(false);
     }
 
     public void CreateSession()

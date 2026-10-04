@@ -20,13 +20,15 @@ public class JetPhysics : NetworkBehaviour
 
     public float AngularMag;
 
-    [Networked] public float ThrustInput {set; get; }
-    [Networked] public float Yaw { set; get; }
-    [Networked] public float Pitch { set; get; }
-    [Networked] public float Roll { set; get; }
-     
+    public float Thrust {set; get; }
+    public float Yaw { set; get; }
+    public float Pitch { set; get; }
+    public float Roll { set; get; }
+
+    public float networkDeltaTime { set; get; }
+
     [Header("Vectors")]
-    [SerializeField] Vector3 Thrust;
+    [SerializeField] Vector3 ThrustVector;
     [SerializeField] float ThrustMag;
     [SerializeField] Vector3 Lift;
     [SerializeField] float LiftMag;
@@ -73,7 +75,7 @@ public class JetPhysics : NetworkBehaviour
 
     private void Update()
     {
-        ThrustMag = Thrust.magnitude;
+        ThrustMag = ThrustVector.magnitude;
         LiftMag = Lift.magnitude;
         DragMag = Drag.magnitude;
 
@@ -88,7 +90,12 @@ public class JetPhysics : NetworkBehaviour
 
         GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform);
 
+        if (HasStateAuthority)
+        {
+            GameEvent_Data.Instance.LocalPlayerParams = GetComponent<JetData>();
 
+            GameEvent_Data.Instance.OnLocalPlayerJoined.Invoke(transform);
+        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)
@@ -96,23 +103,21 @@ public class JetPhysics : NetworkBehaviour
         GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform);
     }
 
+
+    public void SetIputs(float Thrust, float Yaw, float Pitch, float Roll)
+    {
+        this.Thrust = Thrust;
+        this.Yaw = Yaw;
+        this.Pitch = Pitch;
+        this.Roll = Roll;
+    }
     public override void FixedUpdateNetwork()
     {
-        float dt = Runner.DeltaTime;
 
-        Debug.Log(Runner.SessionInfo.Region);
+        if (!HasStateAuthority)
+            return;
 
-
-        if (HasStateAuthority)
-        {
-            InputManager.instance.GetJetPhysicsInput(IncreaseRate, dt, ThrustInput, Yaw, Data.YawThreshold,
-                out float thrustInput, out float yaw, out float roll, out float pitch);
-
-            ThrustInput = thrustInput;
-            Yaw = yaw;
-            Roll = roll;
-            Pitch = pitch;
-        }
+        networkDeltaTime = Runner.DeltaTime;
 
         if (rb != null)
         {
@@ -177,7 +182,7 @@ public class JetPhysics : NetworkBehaviour
     {
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
         {
-            AOA = Vector3.Angle(transform.forward, Thrust) / 90f;
+            AOA = Vector3.Angle(transform.forward, ThrustVector) / 90f;
         }
 
         LiftCoefficient = Data.LiftCoefficientCurve.Evaluate(AOA) + LiftAOA_0;
@@ -202,9 +207,9 @@ public class JetPhysics : NetworkBehaviour
 
     private void CalculateThrustForce()
     {
-        Thrust = transform.forward * Data.ThrustForceAmount * ThrustInput;
+        ThrustVector = transform.forward * Data.ThrustForceAmount * Thrust;
 
-        rb.AddForce(Thrust);
+        rb.AddForce(ThrustVector);
     }
 
     private void CalculateDragForce()
@@ -216,7 +221,7 @@ public class JetPhysics : NetworkBehaviour
 
     private void CalculateLiftForce()
     {
-        Lift = transform.up * Data.WingSurfaceArea * Thrust.magnitude * LiftCoefficient * Data.AirDensity;
+        Lift = transform.up * Data.WingSurfaceArea * ThrustVector.magnitude * LiftCoefficient * Data.AirDensity;
 
         rb.AddForce(Lift);
     }
@@ -225,7 +230,7 @@ public class JetPhysics : NetworkBehaviour
     {
         Gizmos.color = Color.yellow;
 
-        Gizmos.DrawRay(transform.position, Thrust * 3);
+        Gizmos.DrawRay(transform.position, ThrustVector * 3);
 
         Gizmos.color = Color.blue;
 

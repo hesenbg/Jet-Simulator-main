@@ -12,7 +12,7 @@ public class JetConditionUI : MonoBehaviour
 
     private void Update()
     {
-        if (GameEvent_Data.Instance.LocalPlayer == null)
+        if (GameEvent_Data.Instance.LocalPlayerParams == null)
             return;
 
         JetSpeed.text = Mathf.RoundToInt(GameEvent_Data.Instance.LocalPlayerParams.GetSpeed).ToString();

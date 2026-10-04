@@ -102,7 +102,7 @@ public class JetData : MonoBehaviour
 
     public float GetAltitute => transform.position.y - BaseMinYlevel;
 
-    public float GetThrust => Physics.ThrustInput;
+    public float GetThrust => Physics.Thrust;
 
     public float GetRollValue => Physics.Roll;
 

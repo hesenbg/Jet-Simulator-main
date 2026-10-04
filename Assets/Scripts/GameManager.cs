@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] LobbyLogic LobbyLogic;
 
+
     private void Start()
     {
         GameEvent_Data.Instance.CurrentPhase = GamePhase.Session;
@@ -22,7 +23,7 @@ public class GameManager : MonoBehaviour
     private void OnPlayerJoined(Transform local)
     {
         uiLogic.DisableUI();
-        LobbyLogic.gameObject.SetActive(true);
+        LobbyLogic.EnableUI();
         GameEvent_Data.Instance.CurrentPhase = GamePhase.Lobby;
     }
 
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour
 
         if (LobbyLogic.IsAllReady)
         {
-            LobbyLogic.gameObject.SetActive(false);
+            LobbyLogic.DisableUI();
             GameEvent_Data.Instance.CurrentPhase = GamePhase.InGame;
         }
     }

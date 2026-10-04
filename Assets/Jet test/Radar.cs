@@ -47,7 +47,7 @@ public class Radar : MonoBehaviour
 
     private void UpdateJetIcons()
     {
-        Transform local = GameEvent_Data.Instance.LocalPlayer;
+        Transform local = GameEvent_Data.Instance.GetLocalTransform();
         foreach (Transform tr in GameEvent_Data.Instance.PlayerInstances)
         {
             RectTransform rt = JetIcons[tr];

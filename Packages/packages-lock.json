@@ -108,13 +108,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.multiplayer.playmode": {
-      "version": "2.0.2",
+      "version": "file:com.unity.multiplayer.playmode",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "2.0.2"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.6",

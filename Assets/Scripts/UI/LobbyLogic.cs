@@ -16,15 +16,26 @@ public class LobbyLogic : NetworkBehaviour
 
     [Networked] public bool IsAllReady { get; set; }
 
+    [SerializeField] Canvas canvas;
+
     public override void FixedUpdateNetwork()
     {
         CheckEligible();
+    }
 
+    public void EnableUI()
+    {
+        canvas.gameObject.SetActive(true);
+    }
+
+    public void DisableUI()
+    {
+        canvas.gameObject.SetActive(false);
     }
 
     public void SetReady()
     {
-        GameEvent_Data.Instance.GetLocalNetworkedPlayer().IsReady = !GameEvent_Data.Instance.GetLocalNetworkedPlayer().IsReady;
+        GameEvent_Data.Instance.GetLocalNetworkedPlayer().IsReady = true;
     }
 
     private void CheckEligible()

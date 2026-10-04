@@ -19,10 +19,9 @@ public class GameEvent_Data : MonoBehaviour
 
     [SerializeField] Volume GForcePostProcces;
 
-    public JetData LocalPlayerParams {  get; private set; }
+    public JetData LocalPlayerParams;
 
     [Header("Data")]
-    public Transform LocalPlayer;
 
     public List<Transform> PlayerInstances;
 
@@ -41,16 +40,20 @@ public class GameEvent_Data : MonoBehaviour
 
     public Volume GetGForceVolume => GForcePostProcces;
 
-
     public void AddPlayerInstance(Transform player)
     {
         PlayerInstances.Add(player);
     }
 
+    public Transform GetLocalTransform()
+    {
+        return NetworkSpawner.GetLocalTransform();
+    }
+
 
     public NetworkedPlayer GetLocalNetworkedPlayer()
     {
-        LocalPlayer.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
+        GetLocalTransform().gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
 
         return player;
     }
@@ -68,20 +71,9 @@ public class GameEvent_Data : MonoBehaviour
         return true;
     }
 
-    public void AddLocalPlayerInstance(Transform Local)
-    {
-        LocalPlayer = Local;
-
-        LocalPlayerParams = Local.gameObject.GetComponent<JetData>();
-    }
-
     private void Start()
     {
-        NetworkSpawner.LocalPlayerLeft = OnLocalPlayerLeft;
-
-        NetworkSpawner.LocalPlayerJoined = OnLocalPlayerJoined;
-
-        NetworkSpawner.LocalPlayerJoined += AddLocalPlayerInstance;
-
+        NetworkSpawner.LocalPlayerJoined += local => OnLocalPlayerJoined?.Invoke(local);
+        NetworkSpawner.LocalPlayerLeft += () => OnLocalPlayerLeft?.Invoke();
     }
 }
