@@ -1,8 +1,6 @@
 using Fusion;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Collections.Unicode;
 
 public class LobbyLogic : NetworkBehaviour
 {
@@ -20,7 +18,9 @@ public class LobbyLogic : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        CheckEligible();
+        CheckAllReady();
+
+        IsEligibleToStart = CheckLobbyEligible();
     }
 
     public void EnableUI()
@@ -35,10 +35,25 @@ public class LobbyLogic : NetworkBehaviour
 
     public void SetReady()
     {
+        if (!IsEligibleToStart)
+            return;
         GameEvent_Data.Instance.GetLocalNetworkedPlayer().IsReady = true;
     }
 
-    private void CheckEligible()
+    private bool CheckLobbyEligible()
+    {
+        foreach (Transform player in GameEvent_Data.Instance.PlayerInstances)
+        {
+            if (player.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer Networked))
+            {
+                if (Networked.PlayerSide == Side.Neutral)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    private void CheckAllReady()
     {
         IsAllReady = GameEvent_Data.Instance.CheckReadyAll();
     }
@@ -46,14 +61,30 @@ public class LobbyLogic : NetworkBehaviour
     public void SetRedSide()
     {
         var player = GameEvent_Data.Instance.GetLocalNetworkedPlayer();
+
+        if (player.PlayerSide == Side.Red)
+            return;
+        else if (player.PlayerSide== Side.Blue)
+        {
+            RPC_DelBlueSide(player.PlayerName);
+        }
         player.PlayerSide = Side.Red;
+
         RPC_SetRedSide(player.PlayerName);
     }
 
     public void SetBlueSide()
     {
         var player = GameEvent_Data.Instance.GetLocalNetworkedPlayer();
+
+        if (player.PlayerSide == Side.Blue)
+            return;
+        else if (player.PlayerSide == Side.Red)
+        {
+            RPC_DelRedSide(player.PlayerName);
+        }
         player.PlayerSide = Side.Blue;
+
         RPC_SetBlueSide(player.PlayerName);
     }
 
@@ -67,5 +98,17 @@ public class LobbyLogic : NetworkBehaviour
     private void RPC_SetBlueSide(NetworkString<_32> playerName)
     {
         BlueSide.Add(playerName);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_DelRedSide(NetworkString<_32> playerName)
+    {
+        RedSide.Remove(playerName);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_DelBlueSide(NetworkString<_32> playerName)
+    {
+        BlueSide.Remove(playerName);
     }
 }

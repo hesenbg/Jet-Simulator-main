@@ -5,7 +5,7 @@ public class InputData : ScriptableObject
 {
     
 }
-public class InputManager : NetworkBehaviour
+public class InputManager : MonoBehaviour
 {
     public static InputManager instance;
 
@@ -43,24 +43,26 @@ public class InputManager : NetworkBehaviour
         GameEvent_Data.Instance.OnLocalPlayerJoined += PlayerJoined;
     }
 
-    public override void Spawned()
-    {
-        GameEvent_Data.Instance.OnLocalPlayerJoined += PlayerJoined;
-    }
-
     private void PlayerJoined(Transform transform)
     {
         jetMovement = transform.gameObject.GetComponent<JetPhysics>();
     }
 
-    public override void FixedUpdateNetwork()
+    public  void Update()
     {
-        if(GameEvent_Data.Instance.CurrentPhase == GamePhase.InGame)
+
+        if (GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
+            return;
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            UpdateJetMovementInputs(Runner.DeltaTime);
-            jetMovement.SetIputs(Thrust, Yaw, Pitch, Roll);
+            mouseLocked = !mouseLocked;
+
+            Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !mouseLocked;
         }
 
+        UpdateJetMovementInputs(Time.deltaTime);
+        jetMovement.SetIputs(Thrust, Yaw, Pitch, Roll);
     }
 
     private void UpdateJetMovementInputs(float dt)
@@ -85,19 +87,5 @@ public class InputManager : NetworkBehaviour
 
         Roll = Input.GetAxisRaw("Mouse X");
         Pitch = Input.GetAxisRaw("Mouse Y");
-    }
-
-
-    private void Update()
-    {
-        if (GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
-            return;
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            mouseLocked = !mouseLocked;
-
-            Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !mouseLocked;
-        }
     }
 }

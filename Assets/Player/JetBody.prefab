@@ -2597,11 +2597,7 @@ MonoBehaviour:
   HasInput: 0
   currentAngularVelocity: {x: 0, y: 0, z: 0}
   AngularMag: 0
-  _ThrustInput: 0
-  _Yaw: 0
-  _Pitch: 0
-  _Roll: 0
-  Thrust: {x: 0, y: 0, z: 0}
+  ThrustVector: {x: 0, y: 0, z: 0}
   ThrustMag: 0
   Lift: {x: 0, y: 0, z: 0}
   LiftMag: 0
@@ -2776,6 +2772,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2c244bd7f95924197b610f97da2fab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkedPlayer
+  _PlayerSide: 2
+  _PlayerName: 
+  _IsReady: 0
 --- !u!1 &6515024354471409445
 GameObject:
   m_ObjectHideFlags: 0
