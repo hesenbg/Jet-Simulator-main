@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using WebSocketSharp;
 
 public class GameSessionUiLogic : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class GameSessionUiLogic : MonoBehaviour
     [SerializeField] string SessionName;
 
     [SerializeField] string PlayerName;
-    
+
     private void Start()
     {
 
@@ -47,6 +48,8 @@ public class GameSessionUiLogic : MonoBehaviour
         }
     }
 
+
+
     public void AddPlayerName(string Name)
     {
         PlayerName = Name;
@@ -64,12 +67,15 @@ public class GameSessionUiLogic : MonoBehaviour
 
     public void CreateSession()
     {
+        if (SessionName.IsNullOrEmpty() || PlayerName.IsNullOrEmpty())
+            return;
+
         StartCoroutine(CreateSessionDelayed());
     }
 
     private IEnumerator CreateSessionDelayed()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
         NetworkSpawner.CreateSession(SessionName);
     }
 

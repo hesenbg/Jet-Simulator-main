@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WebSocketSharp;
 
 public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 {
@@ -124,6 +125,8 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     public async void JoinSession(string roomName)
     {
+        if (roomName.IsNullOrEmpty())
+            return;
         EnsureRunner();
 
         var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);

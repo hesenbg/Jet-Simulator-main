@@ -88,10 +88,12 @@ public class JetPhysics : NetworkBehaviour
     {
         GameEvent_Data.Instance.AddPlayerInstance(transform);
 
-        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform);
+        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform,HasStateAuthority);
 
         if (HasStateAuthority)
         {
+            GameEvent_Data.Instance.CombatSystem = GetComponent<CombatSystem>();
+
             GameEvent_Data.Instance.LocalPlayerParams = GetComponent<JetData>();
 
             GameEvent_Data.Instance.OnLocalPlayerJoined.Invoke(transform);
@@ -100,7 +102,7 @@ public class JetPhysics : NetworkBehaviour
 
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform);
+        GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform, HasStateAuthority);
     }
 
 

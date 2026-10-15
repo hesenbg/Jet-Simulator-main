@@ -21,6 +21,10 @@ public class GameEvent_Data : MonoBehaviour
 
     public JetData LocalPlayerParams;
 
+    public CombatSystem CombatSystem;
+
+    public RivalJetData LockedJet;
+
     [Header("Data")]
 
     public List<Transform> PlayerInstances;
@@ -32,9 +36,9 @@ public class GameEvent_Data : MonoBehaviour
 
     public Action OnLocalPlayerLeft;
 
-    public Action<Transform> OnPlayerJoined;
+    public Action<Transform,bool> OnPlayerJoined;
 
-    public Action<Transform> OnPlayerLeft;
+    public Action<Transform,bool> OnPlayerLeft;
 
     public Action<List<SessionInfo>> OnSessionListUpdated;
 
@@ -49,7 +53,6 @@ public class GameEvent_Data : MonoBehaviour
     {
         return NetworkSpawner.GetLocalTransform();
     }
-
 
     public NetworkedPlayer GetLocalNetworkedPlayer()
     {

@@ -46,9 +46,9 @@ public class InputManager : MonoBehaviour
     private void PlayerJoined(Transform transform)
     {
         jetMovement = transform.gameObject.GetComponent<JetPhysics>();
-    }
-
-    public  void Update()
+    }  
+     
+    public void Update()
     {
 
         if (GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)

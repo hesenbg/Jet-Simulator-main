@@ -22,7 +22,7 @@ public class Radar : MonoBehaviour
         GameEvent_Data.Instance.OnPlayerJoined = OnPlayerJoined;
     }
 
-    private void OnPlayerLeft(Transform transform)
+    private void OnPlayerLeft(Transform transform,bool IsLocal)
     {
         RectTransform JetIcon = JetIcons[transform];
 
@@ -31,7 +31,7 @@ public class Radar : MonoBehaviour
         JetIcons.Remove(transform);
     }
 
-    private void OnPlayerJoined(Transform transform)
+    private void OnPlayerJoined(Transform transform, bool IsLocal)
     {
         if (JetIcons.ContainsKey(transform))
             return;

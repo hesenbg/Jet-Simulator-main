@@ -2529,6 +2529,7 @@ GameObject:
   - component: {fileID: 8211653284726449780}
   - component: {fileID: 4151384497685826937}
   - component: {fileID: 2809577701084127129}
+  - component: {fileID: 7638414421628710867}
   m_Layer: 0
   m_Name: JetBody
   m_TagString: Untagged
@@ -2690,12 +2691,13 @@ MonoBehaviour:
   SortKey: 125772658
   SendPriority: 1
   EnableInterpolation: 1
-  Flags: 262402
+  Flags: 131330
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8211653284726449780}
   - {fileID: 6389040924234962124}
   - {fileID: 2809577701084127129}
+  - {fileID: 7638414421628710867}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8211653284726449780
 MonoBehaviour:
@@ -2775,6 +2777,19 @@ MonoBehaviour:
   _PlayerSide: 2
   _PlayerName: 
   _IsReady: 0
+--- !u!114 &7638414421628710867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6508180871996175977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba9a4cfc2c91b9547ad045a92c2779a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatSystem
+  CombatData: {fileID: 11400000, guid: b566a4176bf461f49ab31dd26d6e1a89, type: 2}
 --- !u!1 &6515024354471409445
 GameObject:
   m_ObjectHideFlags: 0
