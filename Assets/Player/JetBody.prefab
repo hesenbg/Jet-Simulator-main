@@ -967,6 +967,63 @@ Transform:
   - {fileID: 6355714818997632893}
   m_Father: {fileID: 5088409418955900270}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2710893014281907700
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8776025204163793790}
+  - component: {fileID: 2305689185991406497}
+  m_Layer: 0
+  m_Name: JetData
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8776025204163793790
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2710893014281907700}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6261325621592278537}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2305689185991406497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2710893014281907700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de67345d5960941498d740e5a9362097, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JetData
+  GForceMultipiler: 2
+  CurrentSpeed: {x: 0, y: 0, z: 0}
+  CurrentAOA: 0
+  TimeBetweenChanges: 0.1
+  CurrentTimeBetweenChanges: 0
+  DetectedSpeed: {x: 0, y: 0, z: 0}
+  DetectedAOA: 0
+  SpeedChangeAmount: {x: 0, y: 0, z: 0}
+  AOAChangeAmount: 0
+  GForcePostProccesing: {fileID: 0}
+  InterpolationSpeed: 2
+  BaseMinYlevel: 0
+  IsEnabled: 1
 --- !u!1 &2913386379330855633
 GameObject:
   m_ObjectHideFlags: 0
@@ -2367,6 +2424,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8167967865330272812}
+  - component: {fileID: 3870574843332698681}
   m_Layer: 0
   m_Name: Jet Mesh
   m_TagString: Untagged
@@ -2390,6 +2448,26 @@ Transform:
   - {fileID: 8722237501649877420}
   m_Father: {fileID: 6261325621592278537}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3870574843332698681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6001160241546427849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b656b3ee47a1eef4bae709f48d22a720, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JetAnimations
+  LeftElevator: {fileID: 7359243517737115061}
+  RightElevator: {fileID: 6490976876608190746}
+  LeftVerticalStabilizator: {fileID: 4440368213726518752}
+  RightVerticalStabilizator: {fileID: 9076316212012482490}
+  RightFlaperon: {fileID: 4068744055310375046}
+  LeftFlaperon: {fileID: 475520227341182175}
+  MaxAngle: 15
+  RotationSpeed: 4
 --- !u!1 &6347318807948375939
 GameObject:
   m_ObjectHideFlags: 0
@@ -2522,14 +2600,13 @@ GameObject:
   - component: {fileID: 6261325621592278537}
   - component: {fileID: 5596066483016728243}
   - component: {fileID: 6389040924234962124}
-  - component: {fileID: 4368100914177582693}
-  - component: {fileID: 8019337219486220967}
-  - component: {fileID: 244576043633862620}
+  - component: {fileID: 7638414421628710867}
   - component: {fileID: 7059714878996966511}
   - component: {fileID: 8211653284726449780}
-  - component: {fileID: 4151384497685826937}
   - component: {fileID: 2809577701084127129}
-  - component: {fileID: 7638414421628710867}
+  - component: {fileID: 8214585981541807526}
+  - component: {fileID: 1950056496804692364}
+  - component: {fileID: 244576043633862620}
   m_Layer: 0
   m_Name: JetBody
   m_TagString: Untagged
@@ -2550,6 +2627,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 8776025204163793790}
   - {fileID: 8167967865330272812}
   - {fileID: 1320431754214475398}
   m_Father: {fileID: 0}
@@ -2610,7 +2688,7 @@ MonoBehaviour:
   DragCoefficient: 0
   ThrustMinThreshold: 0
   State: 0
---- !u!114 &4368100914177582693
+--- !u!114 &7638414421628710867
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2619,63 +2697,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6508180871996175977}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b656b3ee47a1eef4bae709f48d22a720, type: 3}
+  m_Script: {fileID: 11500000, guid: ba9a4cfc2c91b9547ad045a92c2779a0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::JetAnimations
-  LeftElevator: {fileID: 7359243517737115061}
-  RightElevator: {fileID: 6490976876608190746}
-  LeftVerticalStabilizator: {fileID: 4440368213726518752}
-  RightVerticalStabilizator: {fileID: 9076316212012482490}
-  RightFlaperon: {fileID: 4068744055310375046}
-  LeftFlaperon: {fileID: 475520227341182175}
-  MaxAngle: 15
-  RotationSpeed: 4
---- !u!114 &8019337219486220967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6508180871996175977}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de67345d5960941498d740e5a9362097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::JetData
-  GForceMultipiler: 2
-  CurrentSpeed: {x: 0, y: 0, z: 0}
-  CurrentAOA: 0
-  TimeBetweenChanges: 0.1
-  CurrentTimeBetweenChanges: 0
-  DetectedSpeed: {x: 0, y: 0, z: 0}
-  DetectedAOA: 0
-  SpeedChangeAmount: {x: 0, y: 0, z: 0}
-  AOAChangeAmount: 0
-  GForcePostProccesing: {fileID: 0}
-  InterpolationSpeed: 2
-  BaseMinYlevel: 0
-  IsEnabled: 1
---- !u!65 &244576043633862620
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6508180871996175977}
-  m_Material: {fileID: 13400000, guid: b444cbe565df0214db6eebd8973f0b91, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 8, y: 3, z: 31.81}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::CombatSystem
+  CombatData: {fileID: 11400000, guid: b566a4176bf461f49ab31dd26d6e1a89, type: 2}
+  LocalJetRadarData: {fileID: 1950056496804692364}
 --- !u!114 &7059714878996966511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2691,13 +2717,14 @@ MonoBehaviour:
   SortKey: 125772658
   SendPriority: 1
   EnableInterpolation: 1
-  Flags: 131330
+  Flags: 262402
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8211653284726449780}
   - {fileID: 6389040924234962124}
-  - {fileID: 2809577701084127129}
   - {fileID: 7638414421628710867}
+  - {fileID: 2809577701084127129}
+  - {fileID: 8214585981541807526}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8211653284726449780
 MonoBehaviour:
@@ -2739,29 +2766,6 @@ MonoBehaviour:
     MinImpactfulCollisionAlignment: 0.3
     ImpactStartCorrectionTime: 0.1
     ImpactCorrectionTimeComplete: 0.3
---- !u!114 &4151384497685826937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6508180871996175977}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1117c51562becfd4c809685ae58e56b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::JetSoundLogic
-  EngineThrust: {fileID: 4826865953613047138}
-  AfterBurnerThrust: {fileID: 8204645437956319434}
-  FrameAerodynamics: {fileID: 2212249489288103068}
-  EngineThrustLow: {fileID: 8300000, guid: 1fd120368896a3f4ba135c7f73aa333f, type: 3}
-  AfterBurner: {fileID: 8300000, guid: a2c9f15c3a1cc964a80c97b96445dbeb, type: 3}
-  data: {fileID: 8019337219486220967}
-  MaxEngineThrustValue: 0.2
-  EngineBasePitch: 0
-  MonuverPitchEffectivness: 0
-  MonuverRollEffectivness: 0
-  InterpolationSpeed: 6
 --- !u!114 &2809577701084127129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2777,7 +2781,7 @@ MonoBehaviour:
   _PlayerSide: 2
   _PlayerName: 
   _IsReady: 0
---- !u!114 &7638414421628710867
+--- !u!114 &8214585981541807526
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2786,10 +2790,45 @@ MonoBehaviour:
   m_GameObject: {fileID: 6508180871996175977}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba9a4cfc2c91b9547ad045a92c2779a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 07c571d6f3e19a54ebf671d9b59ecfe4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CombatSystem
-  CombatData: {fileID: 11400000, guid: b566a4176bf461f49ab31dd26d6e1a89, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::HealthManager
+--- !u!114 &1950056496804692364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6508180871996175977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 975bb4f939e4dbe4899d99944ca25271, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RadarDetectable
+  stealth: 0.2
+  size: 50
+  currentLockState: 0
+--- !u!65 &244576043633862620
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6508180871996175977}
+  m_Material: {fileID: 13400000, guid: b444cbe565df0214db6eebd8973f0b91, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 8, y: 3, z: 31.81}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6515024354471409445
 GameObject:
   m_ObjectHideFlags: 0
@@ -3468,6 +3507,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1320431754214475398}
+  - component: {fileID: 5784651116102777345}
   m_Layer: 0
   m_Name: AudioSources
   m_TagString: Untagged
@@ -3493,6 +3533,29 @@ Transform:
   - {fileID: 2356013044951694725}
   m_Father: {fileID: 6261325621592278537}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5784651116102777345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7990187589634316777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1117c51562becfd4c809685ae58e56b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JetSoundLogic
+  EngineThrust: {fileID: 4826865953613047138}
+  AfterBurnerThrust: {fileID: 8204645437956319434}
+  FrameAerodynamics: {fileID: 2212249489288103068}
+  EngineThrustLow: {fileID: 8300000, guid: 1fd120368896a3f4ba135c7f73aa333f, type: 3}
+  AfterBurner: {fileID: 8300000, guid: a2c9f15c3a1cc964a80c97b96445dbeb, type: 3}
+  data: {fileID: 2305689185991406497}
+  MaxEngineThrustValue: 0.2
+  EngineBasePitch: 0
+  MonuverPitchEffectivness: 0
+  MonuverRollEffectivness: 0
+  InterpolationSpeed: 6
 --- !u!1 &8265179372868686392
 GameObject:
   m_ObjectHideFlags: 0

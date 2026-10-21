@@ -1,20 +1,24 @@
 using UnityEngine;
-
 [CreateAssetMenu(fileName = "JetCombatData")]
-
 public class CombatData : ScriptableObject
 {
-    public float Stealth;
+    [SerializeField] float lockSpeed;
 
-    public float LockSpeed;
+    [SerializeField] int maxMissleCount;
 
-    public int MaxMissleCount;
+    [SerializeField] float reloadSpeed;
 
-    public float ReloadSpeed;
+    [SerializeField] float maxLockDistance;
 
-    public float Size; // both x and y so we can detect in radar
+    [SerializeField] float radarDetectionSize;
 
-    public float MaxLockDistance;
+    public float LockSpeed => lockSpeed;
 
-    public float LockDetectThreshold; // x and y distance of radar lock to start see enemy jets
+    public int MaxMissleCount => maxMissleCount;
+
+    public float ReloadSpeed => reloadSpeed;
+
+    public float RadarDetectionSize => radarDetectionSize;
+
+    public float MaxLockDistance => maxLockDistance;
 }

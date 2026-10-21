@@ -1,109 +1,89 @@
 using Fusion;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public struct RivalJetData
-{
-    public RivalJetData(float stealth, HealthManager hm, Transform jet, bool locked)
-    {
-        IsLocked = locked;
-
-        Stealth = stealth;
-
-        transform = jet;
-
-        healthManager = hm;
-    }
-
-    public bool IsLocked { get; private set; }
-
-    public Transform transform { get; set; }
-    public float Stealth {  get;  set; }
-    public HealthManager healthManager { get;  set; }
-}
-
-public enum LockState {NoLock,InsideLockZone, Locking, Locked }
+public enum LockState { NoLock, InsideLockZone, Locking, Locked }
 
 public class CombatSystem : NetworkBehaviour
 {
-    public List<RivalJetData> JetDatas { get; private set; }
-
     [SerializeField] public CombatData CombatData;
+
+    [SerializeField] RadarDetectable LocalJetRadarData;
+
 
     Action OnFire;
 
-    Side LocalPlayerSide;
+    float LockProgress = 0;
 
-    private void Start()
+    Vector2 ScreenCenter => new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+
+    private void UpdateLockedJet(Camera cam) // finds closest possible jet to the center of the screen
     {
-
-    }
-
-    public override void Spawned()
-    {
-        GameEvent_Data.Instance.OnPlayerJoined += OnPlayerJoined;
-    }
-
-    private void OnPlayerJoined(Transform local, bool IsLocal)
-    {
-        if (local)
-        {
-            foreach (var insatnce in GameEvent_Data.Instance.PlayerInstances)
-            {
-                local.gameObject.TryGetComponent<HealthManager>(out HealthManager HmInstance);
-                insatnce.gameObject.TryGetComponent<CombatSystem>(out CombatSystem CombatInstance);
-
-                JetDatas.Add(new RivalJetData(CombatInstance.CombatData.Stealth, HmInstance, local,false));
-            }
-            return;
-        }
-
-        local.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer network);
-        local.gameObject.TryGetComponent<CombatSystem>(out CombatSystem combat);
-        local.gameObject.TryGetComponent<HealthManager>(out HealthManager hm);
-
-        if (network.PlayerSide!= LocalPlayerSide)
-            JetDatas.Add(new RivalJetData(combat.CombatData.Stealth,hm, local, false));
-    }
-
-    private void UpdateLockedJet()
-    {
+        RadarDetectable closest = null;
         float MinScreenDist = float.MaxValue;
 
-        float MinWorldDist = float .MaxValue;
-
-        foreach(var jet in JetDatas)
+        foreach (var jet in GameEvent_Data.Instance.radarDetectables)
         {
-            float ScreenDist = Vector2.Distance(Camera.main.WorldToScreenPoint(jet.transform.position), new Vector3(Screen.width/2,Screen.height/2));
+            if (jet.transform == transform)
+                return;
 
-            float WorldDistance = Vector3.Distance(transform.position,jet.transform.position);
+            Vector3 screenPos = cam.WorldToScreenPoint(jet.transform.position);
 
-            if (ScreenDist <= MinScreenDist && WorldDistance <= MinWorldDist )
+            //if (screenPos.z <= 0) continue;
+
+            float ScreenDist = Vector2.Distance(screenPos, ScreenCenter);
+            float WorldDistance = Vector3.Distance(transform.position, jet.transform.position);
+
+            Debug.Log(ScreenDist);
+
+            if (ScreenDist <= MinScreenDist && WorldDistance < CombatData.MaxLockDistance)
             {
-                GameEvent_Data.Instance.LockedJet.transform = jet.transform;
-
-                MinWorldDist = WorldDistance;
-
+                closest = jet;
                 MinScreenDist = ScreenDist;
             }
         }
+
+        RadarDetectable previous = GameEvent_Data.Instance.LockedJet;
+
+        if (previous != closest) // if closest jet diffferent than the prev one, then start locking again
+        {
+            LockProgress = 0;
+
+            if (previous != null)
+                previous.SetLockState(LockState.NoLock);
+        }
+
+        GameEvent_Data.Instance.LockedJet = closest;
     }
 
-    private void TryLockJet(Transform jet)
+    private void TryLockJet(RadarDetectable jet, Camera cam)  // checks if it is lockable and locks it 
     {
+        Debug.Log(jet.State);
 
+        Vector3 screenPos = cam.WorldToScreenPoint(jet.transform.position);
+
+        float distance = Vector2.Distance(screenPos, ScreenCenter);
+
+        float JetRCSintersectValue = 1 - distance / (CombatData.RadarDetectionSize + jet.Size);
+
+        if (screenPos.z <= 0 || JetRCSintersectValue <= 0)
+        {
+            jet.SetLockState(LockState.NoLock);
+            LockProgress = 0;
+            return;
+        }
+
+        LockProgress = Mathf.Min(1, LockProgress + JetRCSintersectValue * CombatData.LockSpeed * Runner.DeltaTime);
+
+        jet.SetLockState(LockProgress >= 1 ? LockState.Locked : LockState.Locking);
     }
 
     public override void FixedUpdateNetwork()
     {
-        UpdateLockedJet();
+        Camera cam = Camera.main;
 
+        UpdateLockedJet(cam);
 
-    }
-
-    private void Update()
-    {
-        
+        TryLockJet(GameEvent_Data.Instance.LockedJet, cam);
     }
 }

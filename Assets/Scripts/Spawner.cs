@@ -2,7 +2,6 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
-using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using WebSocketSharp;
@@ -27,15 +26,13 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     [SerializeField] GameObject SpawnPointParent;
 
-
     private NetworkRunner _runner;
 
     private List<SessionInfo> Sessions = new List<SessionInfo>();
 
-
-
     private void Awake()
     {
+
     }
 
     private void OnDestroy()
@@ -69,7 +66,6 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     {
         return LocalPlayerTransform;
     }
-
 
     private void EnsureRunner()
     {
@@ -152,7 +148,8 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
             playerPrefab,
             position,
             rotation,
-            player);
+            player
+        );
 
         var rb = networkPlayerObject.GetComponent<Rigidbody>();
         if (rb != null)

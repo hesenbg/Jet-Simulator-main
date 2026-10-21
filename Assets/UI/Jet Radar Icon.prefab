@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2603330540434072245}
   - component: {fileID: 4625591330231375795}
   m_Layer: 0
-  m_Name: Jet
+  m_Name: Jet Radar Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

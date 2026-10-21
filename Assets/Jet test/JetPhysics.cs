@@ -92,8 +92,6 @@ public class JetPhysics : NetworkBehaviour
 
         if (HasStateAuthority)
         {
-            GameEvent_Data.Instance.CombatSystem = GetComponent<CombatSystem>();
-
             GameEvent_Data.Instance.LocalPlayerParams = GetComponent<JetData>();
 
             GameEvent_Data.Instance.OnLocalPlayerJoined.Invoke(transform);
@@ -105,7 +103,6 @@ public class JetPhysics : NetworkBehaviour
         GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform, HasStateAuthority);
     }
 
-
     public void SetIputs(float Thrust, float Yaw, float Pitch, float Roll)
     {
         this.Thrust = Thrust;
@@ -113,6 +110,7 @@ public class JetPhysics : NetworkBehaviour
         this.Pitch = Pitch;
         this.Roll = Roll;
     }
+
     public override void FixedUpdateNetwork()
     {
 

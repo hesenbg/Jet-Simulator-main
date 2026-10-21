@@ -19,15 +19,15 @@ public class GameEvent_Data : MonoBehaviour
 
     [SerializeField] Volume GForcePostProcces;
 
-    public JetData LocalPlayerParams;
+    public RadarDetectable LockedJet;
 
-    public CombatSystem CombatSystem;
-
-    public RivalJetData LockedJet;
+    public JetData LocalPlayerParams {  get;  set; }
 
     [Header("Data")]
 
     public List<Transform> PlayerInstances;
+
+    public List<RadarDetectable> radarDetectables;
 
     public  GamePhase CurrentPhase;
 
@@ -43,6 +43,11 @@ public class GameEvent_Data : MonoBehaviour
     public Action<List<SessionInfo>> OnSessionListUpdated;
 
     public Volume GetGForceVolume => GForcePostProcces;
+
+    public void AddRadarDetectable(RadarDetectable radarDetectable)
+    {
+        radarDetectables.Add(radarDetectable);
+    }
 
     public void AddPlayerInstance(Transform player)
     {

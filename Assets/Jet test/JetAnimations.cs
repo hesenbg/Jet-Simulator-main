@@ -19,7 +19,7 @@ public class JetAnimations : MonoBehaviour
 
     private void Start()
     {
-        phsyics = GetComponent<JetPhysics>();
+        phsyics = GetComponentInParent<JetPhysics>();
 
         baseLeftElevator = LeftElevator.transform.localRotation;
         baseRightElevator = RightElevator.transform.localRotation;

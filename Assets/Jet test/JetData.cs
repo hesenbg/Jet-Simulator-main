@@ -36,7 +36,7 @@ public class JetData : MonoBehaviour
 
     private void Start()
     {
-        Physics = GetComponent<JetPhysics>();
+        Physics = GetComponentInParent<JetPhysics>();
 
         CurrentTimeBetweenChanges = 0;
 

@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9583d9ea2ade80468fe23ea2b599bea, type: 3}
   m_Name: F22 combat data
   m_EditorClassIdentifier: Assembly-CSharp::CombatData
-  Stealth: 8
-  LockSpeed: 3
-  MaxMissleCount: 12
-  ReloadSpeed: 3.5
-  Size: 40
+  lockSpeed: 1
+  maxMissleCount: 12
+  reloadSpeed: 3
+  maxLockDistance: 40000

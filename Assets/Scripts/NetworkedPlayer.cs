@@ -6,4 +6,9 @@ public class NetworkedPlayer : NetworkBehaviour
     [Networked] public string PlayerName { get; set; }
 
     [Networked] public bool IsReady { get; set; }
+
+    public override void Spawned()
+    {
+        
+    }
 }

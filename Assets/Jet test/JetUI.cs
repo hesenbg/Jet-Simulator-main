@@ -13,6 +13,8 @@ public class JetUI : MonoBehaviour
     [Header("Lock system")]
     [SerializeField] RectTransform CenterLock;
 
+    [SerializeField] RectTransform TargetLock;
+
     [Header("Ally List")]
     [SerializeField] RectTransform parent;
 
@@ -31,11 +33,20 @@ public class JetUI : MonoBehaviour
 
     private void UpdateLockSystemUI()
     {
+        if (GameEvent_Data.Instance.LockedJet == null)
+            return;
+        TargetLock.gameObject.SetActive(GameEvent_Data.Instance.LockedJet.State != LockState.NoLock);
 
+        if (GameEvent_Data.Instance.LockedJet.State == LockState.NoLock)
+            return;
+
+        TargetLock.position = Camera.main.WorldToScreenPoint(GameEvent_Data.Instance.LockedJet.transform.position);
     }
 
     private void Update()
     {
+        UpdateLockSystemUI();
+
         UpdateJetConditions();
     }
 }
