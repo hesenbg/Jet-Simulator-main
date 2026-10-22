@@ -111,7 +111,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   YawThreshold: 1
   AirDensity: 1
-  WeightAmplifier: 5
+  WeightAmplifier: 2
   InputDeadzone: 0.07
   RollAMP: 4.5
   PitchAMP: 6

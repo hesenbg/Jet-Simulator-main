@@ -21,7 +21,7 @@ public class GameEvent_Data : MonoBehaviour
 
     public RadarDetectable LockedJet;
 
-    public JetData LocalPlayerParams {  get;  set; }
+    public JetData JetData {  get;  set; }
 
     [Header("Data")]
 

@@ -50,9 +50,6 @@ public class JetPhysics : NetworkBehaviour
     [Header("State machine")]
     public JetState State;
 
-    bool mouseLocked = true;
-
-    NetworkedPlayer player;
 
     private void Start()
     {
@@ -66,9 +63,6 @@ public class JetPhysics : NetworkBehaviour
         JetCameraController controller = Camera.main.gameObject.GetComponent<JetCameraController>();
 
         controller.jetTarget = transform;
-
-        player = gameObject.GetComponent<NetworkedPlayer>();
-
 
         controller.PlaceCamera();
     }
@@ -92,7 +86,7 @@ public class JetPhysics : NetworkBehaviour
 
         if (HasStateAuthority)
         {
-            GameEvent_Data.Instance.LocalPlayerParams = GetComponent<JetData>();
+            GameEvent_Data.Instance.JetData = GetComponentInChildren<JetData>();
 
             GameEvent_Data.Instance.OnLocalPlayerJoined.Invoke(transform);
         }
@@ -182,7 +176,7 @@ public class JetPhysics : NetworkBehaviour
     {
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
         {
-            AOA = Vector3.Angle(transform.forward, ThrustVector) / 90f;
+            AOA = Vector3.Angle(rb.linearVelocity.normalized, ThrustVector) / 90f;
         }
 
         LiftCoefficient = Data.LiftCoefficientCurve.Evaluate(AOA) + LiftAOA_0;

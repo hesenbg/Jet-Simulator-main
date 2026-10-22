@@ -11,7 +11,6 @@ public class JetCameraController : MonoBehaviour
     [SerializeField] float posR = 0.0f;
 
     [Header("Rotation Follow Speed")]
-    [SerializeField] float rotationDamping = 10f;
     [SerializeField] float SOD_PosInterpolationSpeed;
     SODState posSodState;
 

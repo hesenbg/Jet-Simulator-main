@@ -4,8 +4,6 @@ using UnityEngine.Rendering;
 
 public class JetData : MonoBehaviour
 {
-    float JetAltitute;
-
     float GForce;
 
     public float GForceMultipiler;
@@ -68,10 +66,6 @@ public class JetData : MonoBehaviour
             CurrentTimeBetweenChanges = 0;
         }
     }
-
-
-
-
 
     private void Update()
     {

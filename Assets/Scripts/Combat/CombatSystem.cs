@@ -1,15 +1,12 @@
 using Fusion;
 using System;
 using UnityEngine;
-
 public enum LockState { NoLock, InsideLockZone, Locking, Locked }
-
 public class CombatSystem : NetworkBehaviour
 {
     [SerializeField] public CombatData CombatData;
 
     [SerializeField] RadarDetectable LocalJetRadarData;
-
 
     Action OnFire;
 
@@ -17,28 +14,37 @@ public class CombatSystem : NetworkBehaviour
 
     Vector2 ScreenCenter => new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
 
+    Vector3 pos;
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawRay(transform.position, (pos-transform.position).normalized * CombatData.MaxLockDistance);
+    }
+
     private void UpdateLockedJet(Camera cam) // finds closest possible jet to the center of the screen
     {
         RadarDetectable closest = null;
         float MinScreenDist = float.MaxValue;
 
-        foreach (var jet in GameEvent_Data.Instance.radarDetectables)
+        foreach (RadarDetectable target in GameEvent_Data.Instance.radarDetectables)
         {
-            if (jet.transform == transform)
-                return;
+            pos = target.transform.position;
 
-            Vector3 screenPos = cam.WorldToScreenPoint(jet.transform.position);
+            if (target == LocalJetRadarData)
+                continue;
+
+
+            Vector3 screenPos = cam.WorldToScreenPoint(target.transform.position);
 
             //if (screenPos.z <= 0) continue;
 
             float ScreenDist = Vector2.Distance(screenPos, ScreenCenter);
-            float WorldDistance = Vector3.Distance(transform.position, jet.transform.position);
-
-            Debug.Log(ScreenDist);
+            float WorldDistance = Vector3.Distance(transform.position, target.transform.position);
+ 
 
             if (ScreenDist <= MinScreenDist && WorldDistance < CombatData.MaxLockDistance)
             {
-                closest = jet;
+                closest = target;
                 MinScreenDist = ScreenDist;
             }
         }
@@ -56,9 +62,10 @@ public class CombatSystem : NetworkBehaviour
         GameEvent_Data.Instance.LockedJet = closest;
     }
 
-    private void TryLockJet(RadarDetectable jet, Camera cam)  // checks if it is lockable and locks it 
+    private void TryLockJet(RadarDetectable jet, Camera cam)
     {
-        Debug.Log(jet.State);
+        if(jet== null)  
+            return;
 
         Vector3 screenPos = cam.WorldToScreenPoint(jet.transform.position);
 
@@ -66,7 +73,17 @@ public class CombatSystem : NetworkBehaviour
 
         float JetRCSintersectValue = 1 - distance / (CombatData.RadarDetectionSize + jet.Size);
 
-        if (screenPos.z <= 0 || JetRCSintersectValue <= 0)
+        if (screenPos.z <= 0 || JetRCSintersectValue <= 0)   // z pos is for checking behind the screen
+        {
+            jet.SetLockState(LockState.NoLock);
+            LockProgress = 0;
+            return;
+        }
+
+        Vector3 direction = jet.transform.position - transform.position;
+
+        if (!Physics.Raycast(transform.position, direction.normalized, out RaycastHit hit, CombatData.MaxLockDistance)
+            || hit.collider.GetComponentInParent<RadarDetectable>() != jet)   
         {
             jet.SetLockState(LockState.NoLock);
             LockProgress = 0;

@@ -15,4 +15,5 @@ MonoBehaviour:
   lockSpeed: 1
   maxMissleCount: 12
   reloadSpeed: 3
-  maxLockDistance: 40000
+  maxLockDistance: 1000
+  radarDetectionSize: 0

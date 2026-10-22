@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-
 public class JetUI : MonoBehaviour
 {
     [Header("Conditions")]
@@ -20,16 +19,15 @@ public class JetUI : MonoBehaviour
 
     private void UpdateJetConditions()
     {
-        if (GameEvent_Data.Instance.LocalPlayerParams == null)
+        if (GameEvent_Data.Instance.JetData == null)
             return;
 
-        JetSpeed.text = Mathf.RoundToInt(GameEvent_Data.Instance.LocalPlayerParams.GetSpeed).ToString();
+        JetSpeed.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetSpeed).ToString();
 
-        JetAltitute.text = Mathf.RoundToInt(GameEvent_Data.Instance.LocalPlayerParams.GetAltitute).ToString();
+        JetAltitute.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetAltitute).ToString();
 
-        GForce.text = GameEvent_Data.Instance.LocalPlayerParams.GetGForce.ToString("F1");
+        GForce.text = GameEvent_Data.Instance.JetData.GetGForce.ToString("F1");
     }
-
 
     private void UpdateLockSystemUI()
     {
