@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+
 public class JetUI : MonoBehaviour
 {
     [Header("Conditions")]
@@ -29,16 +30,33 @@ public class JetUI : MonoBehaviour
         GForce.text = GameEvent_Data.Instance.JetData.GetGForce.ToString("F1");
     }
 
+
+
     private void UpdateLockSystemUI()
     {
         if (GameEvent_Data.Instance.LockedJet == null)
+        {
+            TargetLock.gameObject.SetActive(false);
             return;
-        TargetLock.gameObject.SetActive(GameEvent_Data.Instance.LockedJet.State != LockState.NoLock);
+        }
 
-        if (GameEvent_Data.Instance.LockedJet.State == LockState.NoLock)
+        LockState state = GameEvent_Data.Instance.LockedJet.State;
+
+        if (state == LockState.Locked)
+            TargetLock.gameObject.SetActive(true);
+
+        else
+        {
+            TargetLock.gameObject.SetActive(false);
             return;
+        }
 
-        TargetLock.position = Camera.main.WorldToScreenPoint(GameEvent_Data.Instance.LockedJet.transform.position);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(GameEvent_Data.Instance.LockedJet.transform.position);
+
+        screenPos.z = 0;
+
+        TargetLock.gameObject.SetActive(true);
+        TargetLock.position = screenPos;
     }
 
     private void Update()

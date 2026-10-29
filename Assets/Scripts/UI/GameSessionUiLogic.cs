@@ -70,12 +70,6 @@ public class GameSessionUiLogic : MonoBehaviour
         if (SessionName.IsNullOrEmpty() || PlayerName.IsNullOrEmpty())
             return;
 
-        StartCoroutine(CreateSessionDelayed());
-    }
-
-    private IEnumerator CreateSessionDelayed()
-    {
-        yield return new WaitForSeconds(1f);
         NetworkSpawner.CreateSession(SessionName);
     }
 

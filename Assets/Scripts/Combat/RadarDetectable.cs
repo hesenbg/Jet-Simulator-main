@@ -4,7 +4,6 @@ using UnityEngine;
 
 [RequireComponent (typeof(HealthManager))]
 [RequireComponent (typeof(NetworkObject))]
-[RequireComponent (typeof(HealthManager))]
 
 [Serializable]
 public class RadarDetectable : MonoBehaviour
@@ -34,8 +33,4 @@ public class RadarDetectable : MonoBehaviour
     {
         GameEvent_Data.Instance.AddRadarDetectable(this);        
     }
-
-    private void Update()
-    {
-    } 
 }

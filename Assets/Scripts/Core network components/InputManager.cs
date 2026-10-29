@@ -1,10 +1,5 @@
-using Fusion;
-using System;
 using UnityEngine;
-public class InputData : ScriptableObject
-{
-    
-}
+
 public class InputManager : MonoBehaviour
 {
     public static InputManager instance;
@@ -12,6 +7,7 @@ public class InputManager : MonoBehaviour
     [Header("References")]
     [SerializeField] JetPhysics jetMovement;
     [SerializeField] JetParameters jetParameters;
+    [SerializeField] CombatSystem combatSystem;
 
     [Header("Input Keys")]
     [SerializeField] KeyCode ThrustForwardKey;
@@ -19,6 +15,8 @@ public class InputManager : MonoBehaviour
 
     [SerializeField] KeyCode YawRightKey;
     [SerializeField] KeyCode YawLeftKey;
+
+    [SerializeField] KeyCode FireKey;
 
     [Header("Input Values")]
     private bool mouseLocked;
@@ -31,7 +29,6 @@ public class InputManager : MonoBehaviour
     [Header("Private Vars")]
     private float currentThrust;
     private float currentYaw;
-
 
     private void Awake()
     {
@@ -46,13 +43,24 @@ public class InputManager : MonoBehaviour
     private void PlayerJoined(Transform transform)
     {
         jetMovement = transform.gameObject.GetComponent<JetPhysics>();
+
+        combatSystem = transform.gameObject.GetComponent<CombatSystem>();
     }  
      
     public void Update()
     {
-
         if (GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
             return;
+
+        UpdateScreenLock();
+
+        UpdateWeaponInputs();
+
+        UpdateJetMovementInputs(Time.deltaTime);
+    }
+
+    private void UpdateScreenLock()
+    {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             mouseLocked = !mouseLocked;
@@ -60,9 +68,14 @@ public class InputManager : MonoBehaviour
             Cursor.lockState = mouseLocked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !mouseLocked;
         }
+    }
 
-        UpdateJetMovementInputs(Time.deltaTime);
-        jetMovement.SetIputs(Thrust, Yaw, Pitch, Roll);
+    private void UpdateWeaponInputs()
+    {
+        if (Input.GetKeyDown(FireKey))
+        {
+            combatSystem.FireOnShoot();
+        }
     }
 
     private void UpdateJetMovementInputs(float dt)
@@ -87,5 +100,8 @@ public class InputManager : MonoBehaviour
 
         Roll = Input.GetAxisRaw("Mouse X");
         Pitch = Input.GetAxisRaw("Mouse Y");
+
+        jetMovement.SetIputs(Thrust, Yaw, Pitch, Roll);
+
     }
 }

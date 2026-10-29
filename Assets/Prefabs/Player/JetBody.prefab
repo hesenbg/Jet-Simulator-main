@@ -1024,6 +1024,37 @@ MonoBehaviour:
   InterpolationSpeed: 2
   BaseMinYlevel: 0
   IsEnabled: 1
+--- !u!1 &2711397582634494787
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4990338715785710957}
+  m_Layer: 0
+  m_Name: Missle Deployer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4990338715785710957
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2711397582634494787}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -3.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6261325621592278537}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2913386379330855633
 GameObject:
   m_ObjectHideFlags: 0
@@ -2604,10 +2635,10 @@ GameObject:
   - component: {fileID: 7059714878996966511}
   - component: {fileID: 8211653284726449780}
   - component: {fileID: 2809577701084127129}
-  - component: {fileID: 8214585981541807526}
-  - component: {fileID: 1950056496804692364}
+  - component: {fileID: 3845185968772933384}
   - component: {fileID: 244576043633862620}
-  m_Layer: 0
+  - component: {fileID: 6784532930348494599}
+  m_Layer: 3
   m_Name: JetBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2630,6 +2661,7 @@ Transform:
   - {fileID: 8776025204163793790}
   - {fileID: 8167967865330272812}
   - {fileID: 1320431754214475398}
+  - {fileID: 4990338715785710957}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &5596066483016728243
@@ -2701,7 +2733,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatSystem
   CombatData: {fileID: 11400000, guid: b566a4176bf461f49ab31dd26d6e1a89, type: 2}
-  LocalJetRadarData: {fileID: 1950056496804692364}
+  LocalJetRadarData: {fileID: 3845185968772933384}
+  misslePrefab:
+    RawGuidValue: f8ec610887722e54bb538b7e7f3d6504
+  missleBay: {fileID: 4990338715785710957}
 --- !u!114 &7059714878996966511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2724,7 +2759,7 @@ MonoBehaviour:
   - {fileID: 6389040924234962124}
   - {fileID: 7638414421628710867}
   - {fileID: 2809577701084127129}
-  - {fileID: 8214585981541807526}
+  - {fileID: 6784532930348494599}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8211653284726449780
 MonoBehaviour:
@@ -2781,19 +2816,7 @@ MonoBehaviour:
   _PlayerSide: 2
   _PlayerName: 
   _IsReady: 0
---- !u!114 &8214585981541807526
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6508180871996175977}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07c571d6f3e19a54ebf671d9b59ecfe4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthManager
---- !u!114 &1950056496804692364
+--- !u!114 &3845185968772933384
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2829,6 +2852,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 8, y: 3, z: 31.81}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6784532930348494599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6508180871996175977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca2d6e429fb10f9479c4d831732cedc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JetHealthManager
+  MaxHealth: 100
 --- !u!1 &6515024354471409445
 GameObject:
   m_ObjectHideFlags: 0
