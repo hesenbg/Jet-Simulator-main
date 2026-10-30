@@ -322,8 +322,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneAI
   Trajectory: {fileID: 6649375797840688229}
+  TravelPoints: []
   Speed: 25
   Rigidbody: {fileID: -1621136719535294860}
+  _TargetPos: {x: 0, y: 0, z: 0}
 --- !u!54 &-1621136719535294860
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -379,7 +381,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 17, y: 17, z: 17}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4632111700513788856}
