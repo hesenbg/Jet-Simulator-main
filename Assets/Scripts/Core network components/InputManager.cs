@@ -85,7 +85,7 @@ public class InputManager : MonoBehaviour
         else if (Input.GetKey(ThrustBackwardsKey))
             currentThrust -= jetMovement.IncreaseRate * dt;
         else
-            currentThrust = Mathf.MoveTowards(currentThrust,jetMovement.ThrustMinThreshold , jetMovement.IncreaseRate * dt);
+            currentThrust = Mathf.MoveTowards(currentThrust, jetMovement.ThrustMinThreshold, jetMovement.IncreaseRate * dt);
 
         Thrust = Mathf.Clamp01(currentThrust);
 
@@ -98,10 +98,10 @@ public class InputManager : MonoBehaviour
 
         Yaw = Mathf.Clamp(currentYaw, -jetParameters.YawThreshold, jetParameters.YawThreshold);
 
-        Roll = Input.GetAxisRaw("Mouse X");
-        Pitch = Input.GetAxisRaw("Mouse Y");
+        float resScale = Screen.width / 1920f;
+        Roll = Input.GetAxisRaw("Mouse X") * resScale;
+        Pitch = Input.GetAxisRaw("Mouse Y") * resScale;
 
         jetMovement.SetIputs(Thrust, Yaw, Pitch, Roll);
-
     }
 }

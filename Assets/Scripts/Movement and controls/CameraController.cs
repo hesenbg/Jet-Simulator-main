@@ -17,7 +17,7 @@ public class JetCameraController : MonoBehaviour
     public void PlaceCamera()
     {
         Vector3 initialTargetPos = jetTarget.position + (jetTarget.rotation * offset);
-        posSodState = SOD.SODCreate(posF, posZ, posR, initialTargetPos);
+        posSodState = MathFunc.SODCreate(posF, posZ, posR, initialTargetPos);
     }
 
     private void LateUpdate()
@@ -46,7 +46,7 @@ public class JetCameraController : MonoBehaviour
 
         Vector3 targetPosition = jetTarget.position + (Quaternion.Euler(targetEuler) * offset);
 
-        transform.position = SOD.SODUpdate(ref posSodState, Time.deltaTime * SOD_PosInterpolationSpeed, targetPosition);
+        transform.position = MathFunc.SODUpdate(ref posSodState, Time.deltaTime * SOD_PosInterpolationSpeed, targetPosition);
     }
 
     private void OnValidate()
@@ -54,7 +54,7 @@ public class JetCameraController : MonoBehaviour
         if (jetTarget != null)
         {
             Vector3 initialTargetPos = jetTarget.position + (jetTarget.rotation * offset);
-            posSodState = SOD.SODCreate(posF, posZ, posR, initialTargetPos);
+            posSodState = MathFunc.SODCreate(posF, posZ, posR, initialTargetPos);
         }
     }
 }

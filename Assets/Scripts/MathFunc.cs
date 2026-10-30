@@ -7,7 +7,7 @@ public struct SODState
     public Vector3 yd;      // output velocity
     public float k1, k2, k3;
 }
-public static class SOD
+public static class MathFunc
 {
 
 

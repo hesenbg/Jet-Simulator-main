@@ -109,7 +109,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  YawThreshold: 1
+  YawThreshold: 0.4
   AirDensity: 1
   WeightAmplifier: 2
   InputDeadzone: 0.07
