@@ -10,6 +10,8 @@ public class JetPhysics : NetworkBehaviour
     [Header("Parameters")]
     [SerializeField] JetParameters Data;
 
+    [SerializeField] Vector3 angularVelocity;
+
     [Header("Inputs")]
 
     public bool HasInput;
@@ -122,7 +124,10 @@ public class JetPhysics : NetworkBehaviour
             CalculateAOA();
             Weight();
             ApplyManeuver();
+            ApplyArcadeGrip();
         }
+
+        angularVelocity = rb.angularVelocity;
 
         StateMachine();
     }
@@ -164,12 +169,24 @@ public class JetPhysics : NetworkBehaviour
 
     private void ApplyManeuver()
     {
+        if (State == JetState.Ground)
+            return;
+
         Vector3 accelerationTorque =
             transform.up * Yaw * Data.YawAMP +
             transform.right * Pitch * Data.PitchAMP +
             transform.forward * Roll * Data.RollAMP;
 
         rb.AddTorque(accelerationTorque, ForceMode.Acceleration);
+    }
+
+    private void ApplyArcadeGrip()
+    {
+        Vector3 localVelocity = transform.InverseTransformDirection(rb.linearVelocity);
+
+        Vector3 lateralFriction = -transform.right * localVelocity.x * Data.GripFactor;
+
+        rb.AddForce(lateralFriction, ForceMode.Acceleration);
     }
 
     private void CalculateAOA()
@@ -186,9 +203,10 @@ public class JetPhysics : NetworkBehaviour
 
     private void Weight()
     {
-        rb.AddForce(Vector3.down * Data.WeightAmplifier);
+        float speedFactor = Mathf.Clamp01(rb.linearVelocity.magnitude / Data.MaxVelocity);
+        float dynamicWeightAmplifier = Mathf.Lerp(Data.WeightAmplifier, 0.1f, speedFactor);
 
-        WeightMag = rb.mass * Physics.gravity.magnitude * Data.WeightAmplifier;
+        rb.AddForce(Vector3.down * rb.mass * Physics.gravity.magnitude * dynamicWeightAmplifier);
     }
 
     private void ClampSpeed()

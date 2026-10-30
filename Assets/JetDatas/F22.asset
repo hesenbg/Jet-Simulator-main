@@ -76,6 +76,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  LiftAOA_0: 0.3
   DragCoefficientCurve:
     serializedVersion: 2
     m_Curve:
@@ -109,14 +110,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  YawThreshold: 0.4
+  DragAOA_0: 0.1
+  YawThreshold: 0.6
   AirDensity: 1
   WeightAmplifier: 2
   InputDeadzone: 0.07
-  RollAMP: 4.5
-  PitchAMP: 6
-  YawAMP: 0.7
-  AngularAccel: 5
+  RollAMP: 10
+  PitchAMP: 7.5
+  YawAMP: 0.3
+  GripFactor: 7
   AirThresholdDistance: 3
   AirThrustThreshold: 0.5
   AirIncreaseRate: 0.8
