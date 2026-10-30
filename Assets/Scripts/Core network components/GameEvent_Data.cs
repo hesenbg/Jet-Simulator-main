@@ -49,6 +49,11 @@ public class GameEvent_Data : MonoBehaviour
         radarDetectables.Add(radarDetectable);
     }
 
+    public void RemoveRadarDetectable(RadarDetectable radarDetectable)
+    {
+        radarDetectables.Remove(radarDetectable);
+    }
+
     public void AddPlayerInstance(Transform player)
     {
         PlayerInstances.Add(player);

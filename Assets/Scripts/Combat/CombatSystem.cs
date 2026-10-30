@@ -8,13 +8,48 @@ public class CombatSystem : NetworkBehaviour
 
     [SerializeField] RadarDetectable LocalJetRadarData;
 
-    Action OnFire;
+    [SerializeField] NetworkPrefabRef misslePrefab;
+
+    [SerializeField] Transform missleBay;
+
+    [SerializeField] RadarDetectable LockedJet;
+
+    Action OnShoot;
 
     float LockProgress = 0;
 
     Vector2 ScreenCenter => new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
 
     Vector3 pos;
+
+    public override void Spawned()
+    {
+        OnShoot += onShoot;
+    }
+
+    private void onShoot()
+    {
+        if (GameEvent_Data.Instance.LockedJet == null)
+            return;
+
+        if(GameEvent_Data.Instance.LockedJet.State == LockState.Locked)
+        {
+            NetworkObject Object = Runner.Spawn(misslePrefab, missleBay.position, Quaternion.LookRotation(missleBay.forward));
+
+            NetworkId targetId = GameEvent_Data.Instance.LockedJet.transform.GetComponentInParent<NetworkObject>().Id;
+
+            if (Object.TryGetComponent<Missle>(out Missle Missle))
+            {
+                Missle.SetTarget(targetId);
+            }
+
+        }
+    }
+
+    public void FireOnShoot()
+    {
+        OnShoot.Invoke();
+    }
 
     private void OnDrawGizmos()
     {
@@ -42,7 +77,7 @@ public class CombatSystem : NetworkBehaviour
             float WorldDistance = Vector3.Distance(transform.position, target.transform.position);
  
 
-            if (ScreenDist <= MinScreenDist && WorldDistance < CombatData.MaxLockDistance)
+            if (ScreenDist <= MinScreenDist && WorldDistance < CombatData.MaxLockDistance && ScreenDist < CombatData.RadarDetectionSize)
             {
                 closest = target;
                 MinScreenDist = ScreenDist;
@@ -59,7 +94,7 @@ public class CombatSystem : NetworkBehaviour
                 previous.SetLockState(LockState.NoLock);
         }
 
-        GameEvent_Data.Instance.LockedJet = closest;
+        LockedJet = closest;
     }
 
     private void TryLockJet(RadarDetectable jet, Camera cam)
@@ -93,6 +128,12 @@ public class CombatSystem : NetworkBehaviour
         LockProgress = Mathf.Min(1, LockProgress + JetRCSintersectValue * CombatData.LockSpeed * Runner.DeltaTime);
 
         jet.SetLockState(LockProgress >= 1 ? LockState.Locked : LockState.Locking);
+
+        if(jet.State != LockState.NoLock)
+        {
+            GameEvent_Data.Instance.LockedJet = jet;
+        }
+
     }
 
     public override void FixedUpdateNetwork()
@@ -101,6 +142,6 @@ public class CombatSystem : NetworkBehaviour
 
         UpdateLockedJet(cam);
 
-        TryLockJet(GameEvent_Data.Instance.LockedJet, cam);
+        TryLockJet(LockedJet, cam);
     }
 }

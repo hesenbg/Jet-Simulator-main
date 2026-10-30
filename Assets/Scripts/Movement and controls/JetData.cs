@@ -86,12 +86,10 @@ public class JetData : MonoBehaviour
     {
         float acceleration = SpeedChangeAmount.magnitude / TimeBetweenChanges;
         GForce = (acceleration / 10f) + 1f;
-
         GForcePostProccesing.weight = Mathf.Lerp(GForcePostProccesing.weight, GForce / 10f, InterpolationSpeed * Time.deltaTime);
     }
 
-    public float GetSpeed => Physics.rb.linearVelocity.magnitude;
-
+    public float GetSpeed => Physics != null && Physics.rb != null ? Physics.rb.linearVelocity.magnitude : 0f;
     public float GetGForce => GForce;
 
     public float GetAltitute => transform.position.y - BaseMinYlevel;
