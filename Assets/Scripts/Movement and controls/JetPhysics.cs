@@ -10,17 +10,11 @@ public class JetPhysics : NetworkBehaviour
     [Header("Parameters")]
     [SerializeField] JetParameters Data;
 
-    [SerializeField] Vector3 angularVelocity;
-
     [Header("Inputs")]
 
     public bool HasInput;
 
     [Header("Debug - Networked Values")]
-
-    public Vector3 currentAngularVelocity;
-
-    public float AngularMag;
 
     public float Thrust {set; get; }
     public float Yaw { set; get; }
@@ -46,6 +40,9 @@ public class JetPhysics : NetworkBehaviour
     [Header("Runtime Working Values")]
     public float ThrustMinThreshold;
     public float IncreaseRate { get; private set; }
+
+    private float MonuverControlRate;
+
     float LiftAOA_0;
     float DragAOA_0;
 
@@ -74,10 +71,6 @@ public class JetPhysics : NetworkBehaviour
         ThrustMag = ThrustVector.magnitude;
         LiftMag = Lift.magnitude;
         DragMag = Drag.magnitude;
-
-        currentAngularVelocity = rb.angularVelocity;
-
-        AngularMag = rb.angularVelocity.magnitude;
     }
 
     public override void Spawned()
@@ -127,8 +120,6 @@ public class JetPhysics : NetworkBehaviour
             ApplyArcadeGrip();
         }
 
-        angularVelocity = rb.angularVelocity;
-
         StateMachine();
     }
 
@@ -156,6 +147,7 @@ public class JetPhysics : NetworkBehaviour
         DragAOA_0 = Data.GroundBaseDragCoefficient;
         LiftAOA_0 = Data.GroundBaseLiftCoefficient;
         IncreaseRate = Data.GroundIncreaseRate;
+        MonuverControlRate = Data.MonuverControlRateGround * (ThrustMag/Data.MaxVelocity);
         AOA = 0f;
     }
 
@@ -165,19 +157,17 @@ public class JetPhysics : NetworkBehaviour
         IncreaseRate = Data.AirIncreaseRate;
         DragAOA_0 = Data.AirBaseDragCoefficient;
         LiftAOA_0 = Data.AirBaseLiftCoefficient;
+        MonuverControlRate = Data.MonuverControlRateAir;
     }
 
     private void ApplyManeuver()
     {
-        if (State == JetState.Ground)
-            return;
-
         Vector3 accelerationTorque =
             transform.up * Yaw * Data.YawAMP +
             transform.right * Pitch * Data.PitchAMP +
             transform.forward * Roll * Data.RollAMP;
 
-        rb.AddTorque(accelerationTorque, ForceMode.Acceleration);
+        rb.AddTorque(accelerationTorque*MonuverControlRate, ForceMode.Acceleration);
     }
 
     private void ApplyArcadeGrip()

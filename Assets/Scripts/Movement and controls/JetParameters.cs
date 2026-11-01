@@ -25,6 +25,7 @@ public class JetParameters : ScriptableObject
     public float WeightAmplifier;
     public float InputDeadzone;
 
+
     [Header("Mounuver Amplifiers")]
     public float RollAMP;
     public float PitchAMP;
@@ -39,11 +40,13 @@ public class JetParameters : ScriptableObject
     public float AirIncreaseRate;
     public float AirBaseDragCoefficient;
     public float AirBaseLiftCoefficient;
+    public float MonuverControlRateAir;
     [Header("Ground")]
     public float GroundThrustThreshold;
     public float GroundIncreaseRate;
     public float GroundBaseDragCoefficient;
     public float GroundBaseLiftCoefficient;
+    public float MonuverControlRateGround;
 }
 
 
