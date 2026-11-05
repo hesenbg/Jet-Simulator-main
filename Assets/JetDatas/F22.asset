@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f954207bb394cae4d97f03130b121786, type: 3}
   m_Name: F22
   m_EditorClassIdentifier: Assembly-CSharp::JetParameters
-  ThrustForceAmount: 60
-  MaxVelocity: 45
+  ThrustForceAmount: 45
+  MaxVelocity: 35
   WingSurfaceArea: 1
   SurfaceAreaExposed: 1
   LiftCoefficientCurve:
@@ -22,17 +22,26 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1.493804
-      outSlope: 1.493804
+      inSlope: 1.2224596
+      outSlope: 1.2224596
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.40165913
-      value: 0.6
-      inSlope: 1.493804
-      outSlope: 1.493804
+      time: 0.5510062
+      value: 0.6735828
+      inSlope: 0.0026760101
+      outSlope: 0.0026760101
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.6934692
+      value: 0.50018996
+      inSlope: -1.2171075
+      outSlope: -1.2171075
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -47,26 +56,26 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1.2046943
-      outSlope: 1.2046943
+      inSlope: 1.105315
+      outSlope: 1.105315
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.24831629
-      value: 0.29914522
-      inSlope: 2.0885143
-      outSlope: 2.0885143
+      time: 0.43453455
+      value: 0.48029757
+      inSlope: 1.5187274
+      outSlope: 1.5187274
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.4
-      value: 0.75
-      inSlope: 2.9723346
-      outSlope: 2.9723346
+      time: 0.6
+      value: 0.8
+      inSlope: 1.9321399
+      outSlope: 1.9321399
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -79,7 +88,7 @@ MonoBehaviour:
   AirDensity: 1
   WeightAmplifier: 0.3
   InputDeadzone: 0
-  RollAMP: 12
+  RollAMP: 9
   PitchAMP: 12
   YawAMP: 0.2
   GripFactor: 7
