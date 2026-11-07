@@ -22,6 +22,8 @@ public class GameSessionUiLogic : MonoBehaviour
 
     [SerializeField] string PlayerName;
 
+    private bool isCreatingSession;
+
     private void Start()
     {
 
@@ -35,6 +37,8 @@ public class GameSessionUiLogic : MonoBehaviour
 
     private void OnJoined(Transform transform)
     {
+        isCreatingSession = false;
+
         transform.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
 
         player.PlayerName = PlayerName;
@@ -67,8 +71,20 @@ public class GameSessionUiLogic : MonoBehaviour
 
     public void CreateSession()
     {
+        if (isCreatingSession)
+            return;
+
         if (SessionName.IsNullOrEmpty() || PlayerName.IsNullOrEmpty())
             return;
+
+        isCreatingSession = true;
+
+        StartCoroutine(CreateSessionDelayed());
+    }
+
+    private IEnumerator CreateSessionDelayed()
+    {
+        yield return new WaitForSeconds(1.5f);
 
         NetworkSpawner.CreateSession(SessionName);
     }

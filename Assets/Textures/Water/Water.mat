@@ -52,16 +52,16 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaValue: 0.3
-    - _Metallic: 0.2
-    - _Occlusion: 0
+    - _Metallic: 0.96
+    - _Occlusion: 2.18
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RandomSpeed: 0.001
     - _Rate: 1
-    - _Smoothnes: 0.2
+    - _Smoothnes: 1.32
     - _WaveInt: 1
-    - _WaveSpeed: 3.51
-    - _WaveStrenght: 0.02
+    - _WaveSpeed: 4.05
+    - _WaveStrenght: 0.06
     - _X: 0
     - _Z: 0
     m_Colors:

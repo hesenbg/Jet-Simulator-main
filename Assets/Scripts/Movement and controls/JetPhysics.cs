@@ -103,8 +103,7 @@ public class JetPhysics : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
 
-        if (!HasStateAuthority)
-            return;
+        Debug.Log(Thrust);
 
         networkDeltaTime = Runner.DeltaTime;
 

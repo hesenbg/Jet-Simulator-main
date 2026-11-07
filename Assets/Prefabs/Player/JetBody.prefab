@@ -2497,8 +2497,8 @@ MonoBehaviour:
   RightVerticalStabilizator: {fileID: 9076316212012482490}
   RightFlaperon: {fileID: 4068744055310375046}
   LeftFlaperon: {fileID: 475520227341182175}
-  MaxAngle: 8
-  RotationSpeed: 3
+  MaxAngle: 15
+  RotationSpeed: 5
 --- !u!1 &6347318807948375939
 GameObject:
   m_ObjectHideFlags: 0
@@ -2849,7 +2849,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 0.25, z: 3.6}
+  m_Size: {x: 5.58, y: 1.26, z: 20}
   m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!114 &6784532930348494599
 MonoBehaviour:

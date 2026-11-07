@@ -78,8 +78,6 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private const float ReferenceScreenHeight = 1080f;
-
     private void UpdateJetMovementInputs(float dt)
     {
         if (Input.GetKey(ThrustForwardKey))
