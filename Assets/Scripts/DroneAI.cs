@@ -64,7 +64,7 @@ public class DroneAI : NetworkBehaviour
         {
             Vector3 point = transform.TransformPoint(TravelPoints[i]);
 
-            Gizmos.DrawSphere(point, 15f);
+            Gizmos.DrawSphere(point, 1f);
 
             if (i > 0)
                 Gizmos.DrawLine(transform.TransformPoint(TravelPoints[i - 1]), point);

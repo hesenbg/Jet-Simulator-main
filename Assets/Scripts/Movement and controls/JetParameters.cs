@@ -13,9 +13,11 @@ public class JetParameters : ScriptableObject
 
     [Header("Lift Coefficient")]
     public AnimationCurve LiftCoefficientCurve;
+    public float LiftAOA_0;
 
     [Header("Drag Coefficient")]
     public AnimationCurve DragCoefficientCurve;
+    public float DragAOA_0;
 
     [Header("Control")]
     public float YawThreshold;
@@ -23,12 +25,13 @@ public class JetParameters : ScriptableObject
     public float WeightAmplifier;
     public float InputDeadzone;
 
+
     [Header("Mounuver Amplifiers")]
     public float RollAMP;
     public float PitchAMP;
     public float YawAMP;
 
-    public float AngularAccel;
+    public float GripFactor;
 
     [Header("State Thresholds")]
     [Header("Air")]
@@ -37,11 +40,13 @@ public class JetParameters : ScriptableObject
     public float AirIncreaseRate;
     public float AirBaseDragCoefficient;
     public float AirBaseLiftCoefficient;
+    public float MonuverControlRateAir;
     [Header("Ground")]
     public float GroundThrustThreshold;
     public float GroundIncreaseRate;
     public float GroundBaseDragCoefficient;
     public float GroundBaseLiftCoefficient;
+    public float MonuverControlRateGround;
 }
 
 

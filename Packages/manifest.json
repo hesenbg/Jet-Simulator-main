@@ -10,6 +10,7 @@
     "com.unity.multiplayer.center.quickstart": "1.1.2",
     "com.unity.multiplayer.playmode": "2.0.2",
     "com.unity.nuget.mono-cecil": "1.11.6",
+    "com.unity.probuilder": "6.1.4",
     "com.unity.render-pipelines.universal": "17.3.0",
     "com.unity.services.cloudcode": "2.10.3",
     "com.unity.services.deployment": "1.7.2",

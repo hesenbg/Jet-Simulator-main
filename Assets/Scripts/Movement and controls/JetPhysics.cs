@@ -16,10 +16,6 @@ public class JetPhysics : NetworkBehaviour
 
     [Header("Debug - Networked Values")]
 
-    public Vector3 currentAngularVelocity;
-
-    public float AngularMag;
-
     public float Thrust {set; get; }
     public float Yaw { set; get; }
     public float Pitch { set; get; }
@@ -44,6 +40,9 @@ public class JetPhysics : NetworkBehaviour
     [Header("Runtime Working Values")]
     public float ThrustMinThreshold;
     public float IncreaseRate { get; private set; }
+
+    private float MonuverControlRate;
+
     float LiftAOA_0;
     float DragAOA_0;
 
@@ -72,10 +71,6 @@ public class JetPhysics : NetworkBehaviour
         ThrustMag = ThrustVector.magnitude;
         LiftMag = Lift.magnitude;
         DragMag = Drag.magnitude;
-
-        currentAngularVelocity = rb.angularVelocity;
-
-        AngularMag = rb.angularVelocity.magnitude;
     }
 
     public override void Spawned()
@@ -107,10 +102,6 @@ public class JetPhysics : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-
-        if (!HasStateAuthority)
-            return;
-
         networkDeltaTime = Runner.DeltaTime;
 
         if (rb != null)
@@ -122,6 +113,7 @@ public class JetPhysics : NetworkBehaviour
             CalculateAOA();
             Weight();
             ApplyManeuver();
+            ApplyArcadeGrip();
         }
 
         StateMachine();
@@ -151,6 +143,7 @@ public class JetPhysics : NetworkBehaviour
         DragAOA_0 = Data.GroundBaseDragCoefficient;
         LiftAOA_0 = Data.GroundBaseLiftCoefficient;
         IncreaseRate = Data.GroundIncreaseRate;
+        MonuverControlRate = Data.MonuverControlRateGround * (ThrustMag/Data.MaxVelocity);
         AOA = 0f;
     }
 
@@ -160,6 +153,7 @@ public class JetPhysics : NetworkBehaviour
         IncreaseRate = Data.AirIncreaseRate;
         DragAOA_0 = Data.AirBaseDragCoefficient;
         LiftAOA_0 = Data.AirBaseLiftCoefficient;
+        MonuverControlRate = Data.MonuverControlRateAir;
     }
 
     private void ApplyManeuver()
@@ -169,7 +163,16 @@ public class JetPhysics : NetworkBehaviour
             transform.right * Pitch * Data.PitchAMP +
             transform.forward * Roll * Data.RollAMP;
 
-        rb.AddTorque(accelerationTorque, ForceMode.Acceleration);
+        rb.AddTorque(accelerationTorque*MonuverControlRate, ForceMode.Acceleration);
+    }
+
+    private void ApplyArcadeGrip()
+    {
+        Vector3 localVelocity = transform.InverseTransformDirection(rb.linearVelocity);
+
+        Vector3 lateralFriction = -transform.right * localVelocity.x * Data.GripFactor;
+
+        rb.AddForce(lateralFriction, ForceMode.Acceleration);
     }
 
     private void CalculateAOA()
@@ -186,9 +189,10 @@ public class JetPhysics : NetworkBehaviour
 
     private void Weight()
     {
-        rb.AddForce(Vector3.down * Data.WeightAmplifier);
+        float speedFactor = Mathf.Clamp01(rb.linearVelocity.magnitude / Data.MaxVelocity);
+        float dynamicWeightAmplifier = Mathf.Lerp(Data.WeightAmplifier, 0.1f, speedFactor);
 
-        WeightMag = rb.mass * Physics.gravity.magnitude * Data.WeightAmplifier;
+        rb.AddForce(Vector3.down * rb.mass * Physics.gravity.magnitude * dynamicWeightAmplifier);
     }
 
     private void ClampSpeed()

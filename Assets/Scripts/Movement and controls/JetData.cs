@@ -96,6 +96,8 @@ public class JetData : MonoBehaviour
 
     public float GetThrust => Physics.Thrust;
 
+    public float GetAOA => Physics != null && Physics.rb != null ? Physics.AOA : 0;
+
     public float GetRollValue => Physics.Roll;
 
     public float GetPitchValue => Physics.Pitch;

@@ -10,6 +10,8 @@ public class JetUI : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI GForce;
 
+    [SerializeField] TextMeshProUGUI AOA;
+
     [Header("Lock system")]
     [SerializeField] RectTransform CenterLock;
 
@@ -28,6 +30,8 @@ public class JetUI : MonoBehaviour
         JetAltitute.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetAltitute).ToString();
 
         GForce.text = GameEvent_Data.Instance.JetData.GetGForce.ToString("F1");
+
+        AOA.text = GameEvent_Data.Instance.JetData.GetAOA.ToString("F1");
     }
 
 

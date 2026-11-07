@@ -98,9 +98,8 @@ public class InputManager : MonoBehaviour
 
         Yaw = Mathf.Clamp(currentYaw, -jetParameters.YawThreshold, jetParameters.YawThreshold);
 
-        float resScale = Screen.width / 1920f;
-        Roll = Input.GetAxisRaw("Mouse X") * resScale;
-        Pitch = Input.GetAxisRaw("Mouse Y") * resScale;
+        Roll = Input.GetAxis("Mouse X");
+        Pitch = Input.GetAxis("Mouse Y");
 
         jetMovement.SetIputs(Thrust, Yaw, Pitch, Roll);
     }
