@@ -51,17 +51,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AlphaValue: 0.3
-    - _Metallic: 0.96
-    - _Occlusion: 2.18
+    - _AlphaValue: 0
+    - _Metallic: 1
+    - _Occlusion: 1
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RandomSpeed: 0.001
-    - _Rate: 1
-    - _Smoothnes: 1.32
+    - _Rate: 6.27
+    - _Smoothnes: 1
     - _WaveInt: 1
-    - _WaveSpeed: 4.05
-    - _WaveStrenght: 0.06
+    - _WaveSpeed: 2
+    - _WaveStrenght: 0.07
     - _X: 0
     - _Z: 0
     m_Colors:
