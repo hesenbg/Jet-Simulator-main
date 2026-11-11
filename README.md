@@ -52,7 +52,3 @@ To test locally, build the project and run one instance from the build while run
 - Unity
 - Photon Fusion 2 (Shared Mode)
 - C#
-
-## Screenshots
-
-[Add screenshots or a gameplay GIF here]
