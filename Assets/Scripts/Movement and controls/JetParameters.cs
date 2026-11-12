@@ -1,4 +1,5 @@
 using UnityEngine;
+public enum AfterburnerState { Ready, Using, Cooldown }
 
 [CreateAssetMenu(fileName = "JetParameters", menuName = "Jet/Jet Parameters")]
 public class JetParameters : ScriptableObject
@@ -7,6 +8,18 @@ public class JetParameters : ScriptableObject
     public float ThrustForceAmount = 10f;
     public float MaxVelocity;
 
+    public float AfterburnerMaxVelocity;
+    public float AfterburnerForceAmount;
+
+    public float CurrentMaxVelocity;
+    public float CurrentThrustAmount;
+
+    public float AfterburnerDuration;
+    public float AfterburnerCooldown;
+
+    public float CurrentAfterburnerCooldownDuration;
+
+    
     [Header("Lift/Drag - Aerodynamics")]
     public float WingSurfaceArea;
     public float SurfaceAreaExposed;
@@ -24,6 +37,9 @@ public class JetParameters : ScriptableObject
     public float AirDensity;
     public float WeightAmplifier;
     public float InputDeadzone;
+
+
+    public AfterburnerState CurrentState;
 
 
     [Header("Mounuver Amplifiers")]

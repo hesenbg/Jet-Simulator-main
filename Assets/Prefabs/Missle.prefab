@@ -163,8 +163,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Missle
   cone: {fileID: 7923618028062671135}
   rb: {fileID: 4238307493582132930}
-  speed: 200
-  turnSpeed: 150
+  speed: 250
+  turnSpeed: 350
   Parent: {fileID: 0}
   target: {fileID: 0}
   InitialTargetLocation: {x: 0, y: 0, z: 0}
@@ -184,7 +184,7 @@ MonoBehaviour:
   SortKey: 623414788
   SendPriority: 1
   EnableInterpolation: 1
-  Flags: 131330
+  Flags: 262402
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9080817364241090948}

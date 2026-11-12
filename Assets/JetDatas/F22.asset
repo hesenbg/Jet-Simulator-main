@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f954207bb394cae4d97f03130b121786, type: 3}
   m_Name: F22
   m_EditorClassIdentifier: Assembly-CSharp::JetParameters
-  ThrustForceAmount: 120
-  MaxVelocity: 150
+  ThrustForceAmount: 90
+  MaxVelocity: 120
+  AfterburnerMaxVelocity: 160
+  AfterburnerForceAmount: 120
+  AfterburnerDuration: 2.5
+  AfterburnerCooldown: 30
   WingSurfaceArea: 1
   SurfaceAreaExposed: 1
   LiftCoefficientCurve:

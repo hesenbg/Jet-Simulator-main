@@ -51,10 +51,6 @@ public class CombatSystem : NetworkBehaviour
         OnShoot.Invoke();
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawRay(transform.position, (pos-transform.position).normalized * CombatData.MaxLockDistance);
-    }
 
     private void UpdateLockedJet(Camera cam) // finds closest possible jet to the center of the screen
     {

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
@@ -15,6 +16,8 @@ public class InputManager : MonoBehaviour
 
     [SerializeField] KeyCode YawRightKey;
     [SerializeField] KeyCode YawLeftKey;
+
+    [SerializeField] KeyCode AfterBurner;
 
     [SerializeField] KeyCode FireKey;
 
@@ -38,6 +41,8 @@ public class InputManager : MonoBehaviour
     private void Start()
     {
         GameEvent_Data.Instance.OnLocalPlayerJoined += PlayerJoined;
+
+        jetParameters.CurrentState = AfterburnerState.Ready;
     }
 
     private void PlayerJoined(Transform transform)
@@ -51,6 +56,15 @@ public class InputManager : MonoBehaviour
     {
         if (GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
             return;
+
+        if(jetParameters.CurrentState == AfterburnerState.Cooldown)
+        {
+            jetParameters.CurrentAfterburnerCooldownDuration += Time.deltaTime;
+            if(jetParameters.CurrentAfterburnerCooldownDuration >= jetParameters.AfterburnerCooldown)
+            {
+                jetParameters.CurrentState = AfterburnerState.Ready;
+            }
+        }
 
         UpdateScreenLock();
 
@@ -78,8 +92,22 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    IEnumerator AfterburnerPhase()
+    {
+        jetParameters.CurrentState = AfterburnerState.Using;
+        yield return new WaitForSeconds(jetParameters.AfterburnerDuration);
+        jetParameters.CurrentState = AfterburnerState.Cooldown;
+        jetParameters.CurrentAfterburnerCooldownDuration = 0;
+    }
+
     private void UpdateJetMovementInputs(float dt)
     {
+        if (Input.GetKeyDown(AfterBurner) && jetParameters.CurrentState == AfterburnerState.Ready)
+        {
+            jetParameters.CurrentState = AfterburnerState.Using;
+            StartCoroutine(AfterburnerPhase());
+        }
+
         if (Input.GetKey(ThrustForwardKey))
             currentThrust += jetMovement.IncreaseRate * dt;
         else if (Input.GetKey(ThrustBackwardsKey))

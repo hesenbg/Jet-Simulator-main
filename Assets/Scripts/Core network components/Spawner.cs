@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 using WebSocketSharp;
 
 public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
@@ -22,6 +23,8 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     [Header("Instances")]
     public Transform LocalPlayerTransform;
 
+    PlayerRef LocalPlayerRef;
+
     [SerializeField] Transform[] SpawnPoints;
 
     [SerializeField] GameObject SpawnPointParent;
@@ -30,10 +33,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 
     private List<SessionInfo> Sessions = new List<SessionInfo>();
 
-    private void Awake()
-    {
 
-    }
 
     private void OnDestroy()
     {
@@ -136,11 +136,9 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
         });
     }
 
-    public void SpawnPlayer(PlayerRef player)
+    private NetworkObject SpawnPlayer()
     {
-        if (_runner == null || player != _runner.LocalPlayer) return;
-
-        int spawnIndex = SpawnPoints != null && SpawnPoints.Length > 0 ? player.PlayerId % SpawnPoints.Length : 0;
+        int spawnIndex = SpawnPoints != null && SpawnPoints.Length > 0 ? LocalPlayerRef.PlayerId % SpawnPoints.Length : 0;
         Vector3 position = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].position : Vector3.zero;
         Quaternion rotation = SpawnPoints != null && SpawnPoints.Length > 0 ? SpawnPoints[spawnIndex].rotation : Quaternion.identity;
 
@@ -148,7 +146,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
             playerPrefab,
             position,
             rotation,
-            player
+            LocalPlayerRef
         );
 
         var rb = networkPlayerObject.GetComponent<Rigidbody>();
@@ -159,6 +157,17 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
+
+        return networkPlayerObject;
+    }
+
+    public void SpawnPlayer(PlayerRef player)
+    {
+        if (_runner == null || player != _runner.LocalPlayer) return;
+
+        LocalPlayerRef = player;
+
+        NetworkObject networkPlayerObject = SpawnPlayer();
 
         LocalPlayerTransform = networkPlayerObject.transform;
 
