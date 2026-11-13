@@ -6,11 +6,11 @@ public class JetData : MonoBehaviour
 {
     float GForce;
 
-    public float GForceMultipiler;
+    private float GForceMultipiler;
 
-    public Vector3 CurrentSpeed;
+    private Vector3 CurrentSpeed;
 
-    public float CurrentAOA;
+    private float CurrentAOA;
 
     JetPhysics Physics;
 

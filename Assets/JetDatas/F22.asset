@@ -12,10 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f954207bb394cae4d97f03130b121786, type: 3}
   m_Name: F22
   m_EditorClassIdentifier: Assembly-CSharp::JetParameters
-  ThrustForceAmount: 120
-  MaxVelocity: 150
+  ThrustForceAmount: 90
+  MaxVelocity: 120
+  AfterburnerMaxVelocity: 200
+  AfterburnerForceAmount: 200
+  CurrentMaxVelocity: 120
+  CurrentThrustAmount: 90
+  AfterburnerDuration: 5
+  AfterburnerCooldown: 30
+  CurrentAfterburnerCooldownDuration: 30.000286
   WingSurfaceArea: 1
-  SurfaceAreaExposed: 1
+  ThrustDragCoefficient: 2
   LiftCoefficientCurve:
     serializedVersion: 2
     m_Curve:
@@ -88,12 +95,13 @@ MonoBehaviour:
   AirDensity: 1
   WeightAmplifier: 0.3
   InputDeadzone: 0
+  CurrentState: 0
   RollAMP: 7
   PitchAMP: 10
   YawAMP: 0.2
   GripFactor: 7
-  AirThresholdDistance: 0.7
-  AirThrustThreshold: 0.5
+  AirThresholdDistance: 3
+  AirThrustThreshold: 0.65
   AirIncreaseRate: 1.5
   AirBaseDragCoefficient: 0.5
   AirBaseLiftCoefficient: 0.2

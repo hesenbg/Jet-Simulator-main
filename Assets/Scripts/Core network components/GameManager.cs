@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
         if (LobbyLogic.IsAllReady)
         {
             LobbyLogic.DisableUI();
+            LobbyLogic.DisableSessionJoin();
             GameEvent_Data.Instance.CurrentPhase = GamePhase.InGame;
         }
     }

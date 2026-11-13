@@ -1,6 +1,6 @@
 using Fusion;
 using UnityEngine;
-public enum JetState {  Air, Ground}
+public enum JetState { Air, Ground }
 public class JetPhysics : NetworkBehaviour
 {
     [Header("Components")]
@@ -16,7 +16,7 @@ public class JetPhysics : NetworkBehaviour
 
     [Header("Debug - Networked Values")]
 
-    public float Thrust {set; get; }
+    public float Thrust { set; get; }
     public float Yaw { set; get; }
     public float Pitch { set; get; }
     public float Roll { set; get; }
@@ -75,9 +75,11 @@ public class JetPhysics : NetworkBehaviour
 
     public override void Spawned()
     {
+        Data.CurrentAfterburnerCooldownDuration = 0;
+
         GameEvent_Data.Instance.AddPlayerInstance(transform);
 
-        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform,HasStateAuthority);
+        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform, HasStateAuthority);
 
         if (HasStateAuthority)
         {
@@ -89,7 +91,13 @@ public class JetPhysics : NetworkBehaviour
 
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
+        Data.CurrentAfterburnerCooldownDuration = 0;
+
         GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform, HasStateAuthority);
+
+        GameEvent_Data.Instance.radarDetectables.Remove(GetComponent<RadarDetectable>());
+
+        GameEvent_Data.Instance.PlayerInstances.Remove(transform);
     }
 
     public void SetIputs(float Thrust, float Yaw, float Pitch, float Roll)
@@ -104,6 +112,7 @@ public class JetPhysics : NetworkBehaviour
     {
         networkDeltaTime = Runner.DeltaTime;
 
+
         if (rb != null)
         {
             CalculateThrustForce();
@@ -111,6 +120,7 @@ public class JetPhysics : NetworkBehaviour
             CalculateLiftForce();
             ClampSpeed();
             CalculateAOA();
+            ApplyAfterburner();
             Weight();
             ApplyManeuver();
             ApplyArcadeGrip();
@@ -125,7 +135,7 @@ public class JetPhysics : NetworkBehaviour
             State = JetState.Ground;
         else
             State = JetState.Air;
-
+        
         switch (State)
         {
             case JetState.Ground:
@@ -143,7 +153,7 @@ public class JetPhysics : NetworkBehaviour
         DragAOA_0 = Data.GroundBaseDragCoefficient;
         LiftAOA_0 = Data.GroundBaseLiftCoefficient;
         IncreaseRate = Data.GroundIncreaseRate;
-        MonuverControlRate = Data.MonuverControlRateGround * (ThrustMag/Data.MaxVelocity);
+        MonuverControlRate = Data.MonuverControlRateGround * (ThrustMag / Data.CurrentMaxVelocity);
         AOA = 0f;
     }
 
@@ -156,6 +166,20 @@ public class JetPhysics : NetworkBehaviour
         MonuverControlRate = Data.MonuverControlRateAir;
     }
 
+    private void ApplyAfterburner()
+    {
+        if (Data.CurrentState == AfterburnerState.Using)
+        {
+            Data.CurrentMaxVelocity = Data.AfterburnerMaxVelocity;
+            Data.CurrentThrustAmount = Data.AfterburnerForceAmount;
+        }
+        else
+        {
+            Data.CurrentThrustAmount = Data.ThrustForceAmount;
+            Data.CurrentMaxVelocity = Data.MaxVelocity;
+        }
+    }
+
     private void ApplyManeuver()
     {
         Vector3 accelerationTorque =
@@ -163,7 +187,7 @@ public class JetPhysics : NetworkBehaviour
             transform.right * Pitch * Data.PitchAMP +
             transform.forward * Roll * Data.RollAMP;
 
-        rb.AddTorque(accelerationTorque*MonuverControlRate, ForceMode.Acceleration);
+        rb.AddTorque(accelerationTorque * MonuverControlRate, ForceMode.Acceleration);
     }
 
     private void ApplyArcadeGrip()
@@ -179,7 +203,7 @@ public class JetPhysics : NetworkBehaviour
     {
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
         {
-            AOA = Vector3.Angle(rb.linearVelocity.normalized, ThrustVector) / 90f;
+            AOA = Vector3.Angle(rb.linearVelocity.normalized, transform.forward) / 90f;
         }
 
         LiftCoefficient = Data.LiftCoefficientCurve.Evaluate(AOA) + LiftAOA_0;
@@ -189,7 +213,7 @@ public class JetPhysics : NetworkBehaviour
 
     private void Weight()
     {
-        float speedFactor = Mathf.Clamp01(rb.linearVelocity.magnitude / Data.MaxVelocity);
+        float speedFactor = Mathf.Clamp01(rb.linearVelocity.magnitude / Data.CurrentMaxVelocity);
         float dynamicWeightAmplifier = Mathf.Lerp(Data.WeightAmplifier, 0.1f, speedFactor);
 
         rb.AddForce(Vector3.down * rb.mass * Physics.gravity.magnitude * dynamicWeightAmplifier);
@@ -197,22 +221,22 @@ public class JetPhysics : NetworkBehaviour
 
     private void ClampSpeed()
     {
-        if (rb.linearVelocity.magnitude > Data.MaxVelocity)
+        if (rb.linearVelocity.magnitude > Data.CurrentMaxVelocity)
         {
-            rb.linearVelocity = Vector3.ClampMagnitude(rb.linearVelocity, Data.MaxVelocity);
+            rb.linearVelocity = Vector3.ClampMagnitude(rb.linearVelocity, Data.CurrentMaxVelocity);
         }
     }
 
     private void CalculateThrustForce()
     {
-        ThrustVector = transform.forward * Data.ThrustForceAmount * Thrust;
+        ThrustVector = transform.forward * Data.CurrentThrustAmount * Thrust;
 
         rb.AddForce(ThrustVector);
     }
 
     private void CalculateDragForce()
     {
-        Drag = -rb.linearVelocity.normalized * (Mathf.Pow(rb.linearVelocity.magnitude, 1) / 1) * Data.SurfaceAreaExposed * DragCoefficient * Data.AirDensity;
+        Drag = -rb.linearVelocity.normalized * (Mathf.Pow(rb.linearVelocity.magnitude * Data.ThrustDragCoefficient, 1) / 1)  * DragCoefficient * Data.AirDensity;
 
         rb.AddForce(Drag);
     }
@@ -228,15 +252,15 @@ public class JetPhysics : NetworkBehaviour
     {
         Gizmos.color = Color.yellow;
 
-        Gizmos.DrawRay(transform.position, ThrustVector * 3);
+        Gizmos.DrawRay(transform.position, ThrustVector * 12);
 
         Gizmos.color = Color.blue;
 
-        Gizmos.DrawRay(transform.position, Drag * 3);
+        Gizmos.DrawRay(transform.position, Drag * 12);
 
         Gizmos.color = Color.red;
 
-        Gizmos.DrawRay(transform.position, Lift * 3);
+        Gizmos.DrawRay(transform.position, Lift * 12);
 
         Gizmos.color = Color.yellow;
 

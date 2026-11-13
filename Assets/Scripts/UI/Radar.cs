@@ -19,14 +19,25 @@ public class Radar : MonoBehaviour
     {
         GameEvent_Data.Instance.OnPlayerLeft += OnPlayerLeft;
 
-        GameEvent_Data.Instance.OnPlayerJoined = OnPlayerJoined;
+        GameEvent_Data.Instance.OnPlayerJoined += OnPlayerJoined;
     }
 
-    private void OnPlayerLeft(Transform transform,bool IsLocal)
+    private void OnDestroy()
     {
-        RectTransform JetIcon = JetIcons[transform];
+        if (GameEvent_Data.Instance == null)
+            return;
 
-        Destroy(JetIcon);
+        GameEvent_Data.Instance.OnPlayerLeft -= OnPlayerLeft;
+
+        GameEvent_Data.Instance.OnPlayerJoined -= OnPlayerJoined;
+    }
+
+    private void OnPlayerLeft(Transform transform, bool IsLocal)
+    {
+        if (!JetIcons.TryGetValue(transform, out RectTransform JetIcon))
+            return;
+
+        Destroy(JetIcon.gameObject);
 
         JetIcons.Remove(transform);
     }
@@ -50,16 +61,17 @@ public class Radar : MonoBehaviour
         Transform local = GameEvent_Data.Instance.GetLocalTransform();
         foreach (Transform tr in GameEvent_Data.Instance.PlayerInstances)
         {
-            RectTransform rt = JetIcons[tr];
+            if (tr == null || !JetIcons.TryGetValue(tr, out RectTransform rt))
+                continue;
+
             Vector2 offset = new Vector2(
                 (tr.position.x - local.position.x) / Scale,
                 (tr.position.z - local.position.z) / Scale
             );
             if (offset.magnitude > MaxDistanceBetweenIcons)
                 offset = offset.normalized * MaxDistanceBetweenIcons;
-        
+
             rt.localPosition = offset;
-            rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y);
             rt.localRotation = Quaternion.Euler(0, 0, -tr.eulerAngles.y + AngleOffset);
         }
     }
