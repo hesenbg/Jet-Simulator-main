@@ -23,6 +23,8 @@ public class GameEvent_Data : MonoBehaviour
 
     public JetData JetData {  get;  set; }
 
+    [SerializeField] JetParameters Params;
+
     [Header("Data")]
 
     public List<Transform> PlayerInstances;
@@ -63,6 +65,8 @@ public class GameEvent_Data : MonoBehaviour
     {
         return NetworkSpawner.GetLocalTransform();
     }
+
+    public JetParameters GetJetParameters() => Params;
 
     public NetworkedPlayer GetLocalNetworkedPlayer()
     {

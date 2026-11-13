@@ -58,6 +58,12 @@ public class LobbyLogic : NetworkBehaviour
         IsAllReady = GameEvent_Data.Instance.CheckReadyAll();
     }
 
+    public  void DisableSessionJoin()
+    {
+        Runner.SessionInfo.IsOpen = false;
+        Runner.SessionInfo.IsVisible = false;
+    }
+
     public void SetRedSide()
     {
         var player = GameEvent_Data.Instance.GetLocalNetworkedPlayer();

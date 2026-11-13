@@ -22,7 +22,7 @@ public class JetParameters : ScriptableObject
     
     [Header("Lift/Drag - Aerodynamics")]
     public float WingSurfaceArea;
-    public float SurfaceAreaExposed;
+    public float ThrustDragCoefficient;
 
     [Header("Lift Coefficient")]
     public AnimationCurve LiftCoefficientCurve;

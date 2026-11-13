@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::JetParameters
   ThrustForceAmount: 90
   MaxVelocity: 120
-  AfterburnerMaxVelocity: 160
-  AfterburnerForceAmount: 120
-  AfterburnerDuration: 2.5
+  AfterburnerMaxVelocity: 200
+  AfterburnerForceAmount: 200
+  CurrentMaxVelocity: 120
+  CurrentThrustAmount: 90
+  AfterburnerDuration: 5
   AfterburnerCooldown: 30
+  CurrentAfterburnerCooldownDuration: 30.000286
   WingSurfaceArea: 1
-  SurfaceAreaExposed: 1
+  ThrustDragCoefficient: 2
   LiftCoefficientCurve:
     serializedVersion: 2
     m_Curve:
@@ -92,12 +95,13 @@ MonoBehaviour:
   AirDensity: 1
   WeightAmplifier: 0.3
   InputDeadzone: 0
+  CurrentState: 0
   RollAMP: 7
   PitchAMP: 10
   YawAMP: 0.2
   GripFactor: 7
-  AirThresholdDistance: 0.7
-  AirThrustThreshold: 0.5
+  AirThresholdDistance: 3
+  AirThrustThreshold: 0.65
   AirIncreaseRate: 1.5
   AirBaseDragCoefficient: 0.5
   AirBaseLiftCoefficient: 0.2

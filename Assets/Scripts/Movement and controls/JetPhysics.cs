@@ -75,6 +75,8 @@ public class JetPhysics : NetworkBehaviour
 
     public override void Spawned()
     {
+        Data.CurrentAfterburnerCooldownDuration = 0;
+
         GameEvent_Data.Instance.AddPlayerInstance(transform);
 
         GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform, HasStateAuthority);
@@ -89,6 +91,8 @@ public class JetPhysics : NetworkBehaviour
 
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
+        Data.CurrentAfterburnerCooldownDuration = 0;
+
         GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform, HasStateAuthority);
 
         GameEvent_Data.Instance.radarDetectables.Remove(GetComponent<RadarDetectable>());
@@ -107,6 +111,7 @@ public class JetPhysics : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         networkDeltaTime = Runner.DeltaTime;
+
 
         if (rb != null)
         {
@@ -130,7 +135,7 @@ public class JetPhysics : NetworkBehaviour
             State = JetState.Ground;
         else
             State = JetState.Air;
-
+        
         switch (State)
         {
             case JetState.Ground:
@@ -231,7 +236,7 @@ public class JetPhysics : NetworkBehaviour
 
     private void CalculateDragForce()
     {
-        Drag = -rb.linearVelocity.normalized * (Mathf.Pow(rb.linearVelocity.magnitude, 1) / 1) * Data.SurfaceAreaExposed * DragCoefficient * Data.AirDensity;
+        Drag = -rb.linearVelocity.normalized * (Mathf.Pow(rb.linearVelocity.magnitude * Data.ThrustDragCoefficient, 1) / 1)  * DragCoefficient * Data.AirDensity;
 
         rb.AddForce(Drag);
     }

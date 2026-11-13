@@ -12,6 +12,10 @@ public class JetUI : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI AOA;
 
+    [SerializeField] TextMeshProUGUI AfterburnerReady;
+
+    [SerializeField] TextMeshProUGUI FlaresReady;
+
     [Header("Lock system")]
     [SerializeField] RectTransform CenterLock;
 
@@ -25,13 +29,15 @@ public class JetUI : MonoBehaviour
         if (GameEvent_Data.Instance.JetData == null)
             return;
 
-        JetSpeed.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetSpeed).ToString();
+        JetSpeed.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetSpeed).ToString() + " km/h";
 
-        JetAltitute.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetAltitute).ToString();
+        JetAltitute.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetAltitute).ToString() + " m";
 
-        GForce.text = GameEvent_Data.Instance.JetData.GetGForce.ToString("F1");
+        GForce.text = GameEvent_Data.Instance.JetData.GetGForce.ToString("F1") + " G";
 
-        AOA.text = GameEvent_Data.Instance.JetData.GetAOA.ToString("F1");
+        AOA.text = GameEvent_Data.Instance.JetData.GetAOA.ToString("F1") + "°";
+
+        AfterburnerReady.text = GameEvent_Data.Instance.GetJetParameters().CurrentState.ToString();
     }
 
 
