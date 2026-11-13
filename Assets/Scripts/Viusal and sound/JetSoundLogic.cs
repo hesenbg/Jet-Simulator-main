@@ -5,8 +5,6 @@ public class JetSoundLogic : MonoBehaviour
     [Header("Sources")]
     [SerializeField] AudioSource EngineThrust;
 
-    [SerializeField] AudioSource AfterBurnerThrust;
-
     [SerializeField] AudioSource AfterBurnerIgnition;
 
     [SerializeField] AudioSource FrameAerodynamics;
@@ -27,7 +25,6 @@ public class JetSoundLogic : MonoBehaviour
 
     float EngineBasePitch;
     float EngineLevel;
-    float AfterburnerLevel;
     float AerodynamicsLevel;
     Quaternion LastRotation;
     bool HasAfterburnerStartCalled = false;
@@ -51,9 +48,6 @@ public class JetSoundLogic : MonoBehaviour
         EngineLevel = Mathf.MoveTowards(EngineLevel, GameEvent_Data.Instance.JetData.GetThrust, Step);
         EngineThrust.volume = EngineLevel * MaxEngineThrustValue;
         EngineThrust.pitch = EngineBasePitch + EngineLevel * EnginePitchRange;
-
-        AfterburnerLevel = Mathf.MoveTowards(AfterburnerLevel, State == AfterburnerState.Using ? 1f : 0f, Step);
-        AfterBurnerThrust.volume = AfterburnerLevel;
 
         Vector3 Delta = (Quaternion.Inverse(LastRotation) * transform.rotation).eulerAngles;
         LastRotation = transform.rotation;
