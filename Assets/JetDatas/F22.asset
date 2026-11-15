@@ -20,7 +20,7 @@ MonoBehaviour:
   CurrentThrustAmount: 90
   AfterburnerDuration: 5
   AfterburnerCooldown: 30
-  CurrentAfterburnerCooldownDuration: 30.000286
+  CurrentAfterburnerCooldownDuration: 0
   WingSurfaceArea: 1
   ThrustDragCoefficient: 2
   LiftCoefficientCurve:
@@ -56,7 +56,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  LiftAOA_0: 0.2
+  LiftAOA_0: 0.1
   DragCoefficientCurve:
     serializedVersion: 2
     m_Curve:
@@ -95,7 +95,7 @@ MonoBehaviour:
   AirDensity: 1
   WeightAmplifier: 0.3
   InputDeadzone: 0
-  CurrentState: 0
+  CurrentState: 2
   RollAMP: 7
   PitchAMP: 10
   YawAMP: 0.2
