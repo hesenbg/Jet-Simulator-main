@@ -44,13 +44,13 @@ public class JetUI : MonoBehaviour
 
     private void UpdateLockSystemUI()
     {
-        if (GameEvent_Data.Instance.LockedJet == null)
+        if (GameEvent_Data.Instance.GetLockedJet == null)
         {
             TargetLock.gameObject.SetActive(false);
             return;
         }
 
-        LockState state = GameEvent_Data.Instance.LockedJet.State;
+        LockState state = GameEvent_Data.Instance.GetLockedJet.State;
 
         if (state == LockState.Locked)
             TargetLock.gameObject.SetActive(true);
@@ -61,7 +61,7 @@ public class JetUI : MonoBehaviour
             return;
         }
 
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(GameEvent_Data.Instance.LockedJet.transform.position);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(GameEvent_Data.Instance.GetLockedJet.transform.position);
 
         screenPos.z = 0;
 

@@ -19,7 +19,7 @@ public class GameEvent_Data : MonoBehaviour
 
     [SerializeField] Volume GForcePostProcces;
 
-    public RadarDetectable LockedJet;
+    [SerializeField] private RadarDetectable LockedJet;
 
     public JetData JetData {  get;  set; }
 
@@ -50,6 +50,10 @@ public class GameEvent_Data : MonoBehaviour
     {
         radarDetectables.Add(radarDetectable);
     }
+
+    public RadarDetectable GetLockedJet => LockedJet;
+
+    public void SetLockedJet(RadarDetectable jet) { LockedJet = jet; } 
 
     public void RemoveRadarDetectable(RadarDetectable radarDetectable)
     {

@@ -19,7 +19,9 @@ public class JetParameters : ScriptableObject
 
     public float CurrentAfterburnerCooldownDuration;
 
-    
+    public float AfterburnerTransitionSpeed;
+
+
     [Header("Lift/Drag - Aerodynamics")]
     public float WingSurfaceArea;
     public float ThrustDragCoefficient;

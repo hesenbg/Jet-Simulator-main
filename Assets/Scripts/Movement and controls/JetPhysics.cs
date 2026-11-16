@@ -168,16 +168,14 @@ public class JetPhysics : NetworkBehaviour
 
     private void ApplyAfterburner()
     {
-        if (Data.CurrentState == AfterburnerState.Using)
-        {
-            Data.CurrentMaxVelocity = Data.AfterburnerMaxVelocity;
-            Data.CurrentThrustAmount = Data.AfterburnerForceAmount;
-        }
-        else
-        {
-            Data.CurrentThrustAmount = Data.ThrustForceAmount;
-            Data.CurrentMaxVelocity = Data.MaxVelocity;
-        }
+        bool isUsing = Data.CurrentState == AfterburnerState.Using;
+
+        float targetMaxVelocity = isUsing ? Data.AfterburnerMaxVelocity : Data.MaxVelocity;
+        float targetThrust = isUsing ? Data.AfterburnerForceAmount : Data.ThrustForceAmount;
+        float t = Data.AfterburnerTransitionSpeed * Runner.DeltaTime;
+
+        Data.CurrentMaxVelocity = Mathf.Lerp(Data.CurrentMaxVelocity, targetMaxVelocity, t);
+        Data.CurrentThrustAmount = Mathf.Lerp(Data.CurrentThrustAmount, targetThrust, t);
     }
 
     private void ApplyManeuver()

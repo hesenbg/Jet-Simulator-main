@@ -14,9 +14,14 @@ public class Missle : NetworkBehaviour
 
     [SerializeField] Transform target;
 
+    [SerializeField] AudioSource audioSource;
+
+    [SerializeField] AudioClip audioClip;
+
     [Networked] NetworkId TargetNetworkID { get; set; }
 
     TickTimer NoTargetTimer;
+
 
     [SerializeField] private Vector3 InitialTargetLocation;
 
@@ -31,6 +36,8 @@ public class Missle : NetworkBehaviour
         cone = GetComponent<VisionCone>();
 
         NoTargetTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+
+        audioSource.PlayOneShot(audioClip);
     }
 
     public override void FixedUpdateNetwork()

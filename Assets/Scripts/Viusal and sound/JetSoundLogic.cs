@@ -3,11 +3,15 @@ using UnityEngine;
 public class JetSoundLogic : MonoBehaviour
 {
     [Header("Sources")]
+    [Header("Movement")]
     [SerializeField] AudioSource EngineThrust;
 
     [SerializeField] AudioSource AfterBurnerIgnition;
 
     [SerializeField] AudioSource FrameAerodynamics;
+
+    [Header("Combat")]
+    [SerializeField] AudioSource RadarLock;
 
     [Header("SFXs")]
     [SerializeField] AudioClip AfterBurner;
@@ -23,9 +27,14 @@ public class JetSoundLogic : MonoBehaviour
 
     [SerializeField] float InterpolationSpeed;
 
+    [SerializeField] float LockBeepMaxInterval;
+
+    [SerializeField] float LockBeepMinInterval;
+
     float EngineBasePitch;
     float EngineLevel;
     float AerodynamicsLevel;
+    float BeepTimer;
     Quaternion LastRotation;
     bool HasAfterburnerStartCalled = false;
 
@@ -41,6 +50,40 @@ public class JetSoundLogic : MonoBehaviour
     }
 
     private void Update()
+    {
+        UpdateJetMovementSound();
+        UpdateJetAlarmSound();
+        UpdateJetCombatSound();
+    }
+
+
+    private void UpdateJetCombatSound()
+    {
+        var LockedJet = GameEvent_Data.Instance.GetLockedJet;
+
+        if (LockedJet == null || LockedJet.State == LockState.NoLock)
+        {
+            BeepTimer = 0f;
+            return;
+        }
+
+        float Progress = LockedJet.State == LockState.Locked ? 1f : Mathf.Clamp01(LockedJet.LockProgress);
+        float Interval = Mathf.Lerp(LockBeepMaxInterval, LockBeepMinInterval, Progress);
+
+        BeepTimer -= Time.deltaTime;
+        if (BeepTimer <= 0f)
+        {
+            RadarLock.Play();
+            BeepTimer = Interval;
+        }
+    }
+
+    private void UpdateJetAlarmSound()
+    {
+
+    }
+
+    private void UpdateJetMovementSound()
     {
         float Step = InterpolationSpeed * Time.deltaTime;
         AfterburnerState State = GameEvent_Data.Instance.GetJetParameters().CurrentState;
