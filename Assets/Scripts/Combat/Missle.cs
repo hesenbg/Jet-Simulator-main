@@ -7,8 +7,9 @@ public class Missle : NetworkBehaviour
 {
     [SerializeField] VisionCone cone;
     [SerializeField] Rigidbody rb;
-    [SerializeField] float speed;
+    [SerializeField] float speed = 30f;
     [SerializeField] float turnSpeed = 180f;
+    [SerializeField] float navigationConstant = 4f;
 
     [SerializeField] Transform Parent;
 
@@ -22,53 +23,133 @@ public class Missle : NetworkBehaviour
 
     TickTimer NoTargetTimer;
 
-
     [SerializeField] private Vector3 InitialTargetLocation;
 
     public MissleState state;
+
+    private Vector3 previousTargetPosition;
+    private bool hasPreviousTargetPosition;
+    private bool hasHit;
 
     public void SetTarget(NetworkId targetID) => TargetNetworkID = targetID;
 
     public override void Spawned()
     {
-        rb = GetComponent<Rigidbody>();
+        if (rb == null)
+            rb = GetComponent<Rigidbody>();
 
-        cone = GetComponent<VisionCone>();
+        if (cone == null)
+            cone = GetComponent<VisionCone>();
 
         NoTargetTimer = TickTimer.CreateFromSeconds(Runner, 3f);
 
-        audioSource.PlayOneShot(audioClip);
+        if (audioSource != null && audioClip != null)
+            audioSource.PlayOneShot(audioClip, 1f);
+
+        if (rb != null)
+            rb.linearVelocity = transform.forward * speed;
     }
 
     public override void FixedUpdateNetwork()
     {
-
         if (target == null && Runner.TryFindObject(TargetNetworkID, out NetworkObject targetObject))
+        {
             target = targetObject.transform;
-
-        if (target == null)
-            target = cone.GetClosest();
+            hasPreviousTargetPosition = false;
+        }
 
         if (target == null)
         {
+            Transform closest = cone.GetClosest();
+            if (closest != null)
+            {
+                target = closest;
+                hasPreviousTargetPosition = false;
+            }
+        }
+
+        if (target == null)
+        {
+            state = MissleState.Search;
+            hasPreviousTargetPosition = false;
+            rb.linearVelocity = transform.forward * speed;
+
             if (NoTargetTimer.Expired(Runner))
                 Runner.Despawn(Object);
             return;
         }
 
+        state = MissleState.Chase;
         Chase();
     }
 
     private void Chase()
     {
-        Vector3 direction = target.position - transform.position;
-        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        float dt = Runner.DeltaTime;
+        if (dt <= 0f)
+            return;
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
-        rb.linearVelocity = transform.forward * speed;
+        Vector3 targetPosition = target.position;
+        Vector3 targetVelocity = GetTargetVelocity(targetPosition, dt);
+
+        Vector3 missilePosition = rb.position;
+        Vector3 missileVelocity = rb.linearVelocity.sqrMagnitude > 0.01f ? rb.linearVelocity : transform.forward * speed;
+
+        Vector3 los = targetPosition - missilePosition;
+        float distanceSqr = los.sqrMagnitude;
+
+        if (distanceSqr < 0.0001f)
+            return;
+
+        float distance = Mathf.Sqrt(distanceSqr);
+        Vector3 losDirection = los / distance;
+
+        Vector3 relativeVelocity = targetVelocity - missileVelocity;
+        float closingVelocity = -Vector3.Dot(relativeVelocity, losDirection);
+
+        Vector3 desiredDirection;
+
+        if (closingVelocity > 0f)
+        {
+            Vector3 losRotationRate = Vector3.Cross(los, relativeVelocity) / distanceSqr;
+            Vector3 lateralAcceleration = navigationConstant * closingVelocity * Vector3.Cross(losRotationRate, losDirection);
+            Vector3 nextVelocity = missileVelocity + lateralAcceleration * dt;
+            desiredDirection = nextVelocity.normalized;
+        }
+        else
+        {
+            desiredDirection = losDirection;
+        }
+
+        float maxRadiansDelta = turnSpeed * Mathf.Deg2Rad * dt;
+        Vector3 steeredDirection = Vector3.RotateTowards(transform.forward, desiredDirection, maxRadiansDelta, 0f).normalized;
+
+        Quaternion targetRotation = Quaternion.LookRotation(steeredDirection);
+        transform.rotation = targetRotation;
+        rb.rotation = targetRotation;
+        rb.linearVelocity = steeredDirection * speed;
     }
 
-    private bool hasHit;
+    private Vector3 GetTargetVelocity(Vector3 currentTargetPosition, float dt)
+    {
+        if (target.TryGetComponent<Rigidbody>(out Rigidbody targetRb))
+        {
+            previousTargetPosition = currentTargetPosition;
+            hasPreviousTargetPosition = true;
+            return targetRb.linearVelocity;
+        }
+
+        if (!hasPreviousTargetPosition)
+        {
+            previousTargetPosition = currentTargetPosition;
+            hasPreviousTargetPosition = true;
+            return Vector3.zero;
+        }
+
+        Vector3 estimatedVelocity = (currentTargetPosition - previousTargetPosition) / dt;
+        previousTargetPosition = currentTargetPosition;
+        return estimatedVelocity;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
