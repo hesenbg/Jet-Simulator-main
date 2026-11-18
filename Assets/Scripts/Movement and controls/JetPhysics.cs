@@ -46,9 +46,6 @@ public class JetPhysics : NetworkBehaviour
     float LiftAOA_0;
     float DragAOA_0;
 
-    [Header("State machine")]
-    public JetState State;
-
 
     private void Start()
     {
@@ -79,7 +76,7 @@ public class JetPhysics : NetworkBehaviour
 
         GameEvent_Data.Instance.AddPlayerInstance(transform);
 
-        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform, HasStateAuthority);
+        GameEvent_Data.Instance.OnPlayerSpawned.Invoke(transform, HasStateAuthority);
 
         if (HasStateAuthority)
         {
@@ -93,7 +90,7 @@ public class JetPhysics : NetworkBehaviour
     {
         Data.CurrentAfterburnerCooldownDuration = 0;
 
-        GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform, HasStateAuthority);
+        GameEvent_Data.Instance.OnPlayerDespawn.Invoke(transform, HasStateAuthority);
 
         GameEvent_Data.Instance.radarDetectables.Remove(GetComponent<RadarDetectable>());
 
@@ -132,11 +129,11 @@ public class JetPhysics : NetworkBehaviour
     private void StateMachine()
     {
         if (Physics.Raycast(transform.position, -transform.up, Data.AirThresholdDistance))
-            State = JetState.Ground;
+           Data.State = JetState.Ground;
         else
-            State = JetState.Air;
+            Data.State = JetState.Air;
         
-        switch (State)
+        switch (Data.State)
         {
             case JetState.Ground:
                 JetGroundState();

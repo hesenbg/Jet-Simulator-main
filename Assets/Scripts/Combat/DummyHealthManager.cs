@@ -9,11 +9,9 @@ public class DummyHealthManager : HealthManager
 
     public override void OnDeath()
     {
-        
-        GameEvent_Data.Instance.RemoveRadarDetectable(GetComponent<RadarDetectable>());
-
         if (Object.HasStateAuthority)
         {
+            GameEvent_Data.Instance.RemoveRadarDetectable(GetComponent<RadarDetectable>());
             Runner.Despawn(Object);
         }
     }

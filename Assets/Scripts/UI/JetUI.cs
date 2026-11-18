@@ -24,6 +24,17 @@ public class JetUI : MonoBehaviour
     [Header("Ally List")]
     [SerializeField] RectTransform parent;
 
+
+    public void EnableUI()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void DisableUI()
+    {
+        gameObject.SetActive(false);
+    }
+
     private void UpdateJetConditions()
     {
         if (GameEvent_Data.Instance.JetData == null)

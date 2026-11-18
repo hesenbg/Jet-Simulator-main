@@ -8,6 +8,8 @@ public class JetVFX : MonoBehaviour
     [SerializeField] ParticleSystem JetVapor1;
     [SerializeField] ParticleSystem JetVapor2;
 
+    [SerializeField] GameObject WingTrails;
+
     ParticleSystem[] engines;
     ParticleSystem[] vapors;
 
@@ -50,6 +52,8 @@ public class JetVFX : MonoBehaviour
 
     private void Update()
     {
+        WingTrails.SetActive(GameEvent_Data.Instance.GetJetParameters().State == JetState.Air ? true : false);
+
         CurrentThrustLenght = GameEvent_Data.Instance.JetData.GetThrust;
 
         CurrentAlpaValue = Mathf.Clamp01(GameEvent_Data.Instance.JetData.GetAOA);

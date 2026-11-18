@@ -43,6 +43,8 @@ public class JetParameters : ScriptableObject
 
     public AfterburnerState CurrentState;
 
+    public JetState State;
+
 
     [Header("Mounuver Amplifiers")]
     public float RollAMP;
