@@ -14,12 +14,14 @@ public class JetPhysics : NetworkBehaviour
 
     public bool HasInput;
 
+    [Networked] public JetState State {  get; private set; }
+
     [Header("Debug - Networked Values")]
 
-    public float Thrust { set; get; }
-    public float Yaw { set; get; }
-    public float Pitch { set; get; }
-    public float Roll { set; get; }
+    [Networked] public float Thrust { set; get; }
+    [Networked] public float Yaw { set; get; }
+    [Networked] public float Pitch { set; get; }
+    [Networked] public float Roll { set; get; }
 
     public float networkDeltaTime { set; get; }
 
@@ -33,7 +35,7 @@ public class JetPhysics : NetworkBehaviour
     [SerializeField] float WeightMag;
 
     [Header("Aerodynamics")]
-    public float AOA;
+    [Networked] public float AOA { set; get; }
     [SerializeField] float LiftCoefficient;
     [SerializeField] float DragCoefficient;
 
@@ -129,11 +131,11 @@ public class JetPhysics : NetworkBehaviour
     private void StateMachine()
     {
         if (Physics.Raycast(transform.position, -transform.up, Data.AirThresholdDistance))
-           Data.State = JetState.Ground;
+           State = JetState.Ground;
         else
-            Data.State = JetState.Air;
+            State = JetState.Air;
         
-        switch (Data.State)
+        switch (State)
         {
             case JetState.Ground:
                 JetGroundState();
@@ -165,7 +167,7 @@ public class JetPhysics : NetworkBehaviour
 
     private void ApplyAfterburner()
     {
-        bool isUsing = Data.CurrentState == AfterburnerState.Using;
+        bool isUsing = Data.CurrentAfterburnerState == AfterburnerState.Using;
 
         float targetMaxVelocity = isUsing ? Data.AfterburnerMaxVelocity : Data.MaxVelocity;
         float targetThrust = isUsing ? Data.AfterburnerForceAmount : Data.ThrustForceAmount;

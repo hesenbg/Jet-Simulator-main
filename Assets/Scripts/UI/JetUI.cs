@@ -48,7 +48,7 @@ public class JetUI : MonoBehaviour
 
         AOA.text = GameEvent_Data.Instance.JetData.GetAOA.ToString("F1") + "°";
 
-        AfterburnerReady.text = GameEvent_Data.Instance.GetJetParameters().CurrentState.ToString();
+        AfterburnerReady.text = GameEvent_Data.Instance.GetJetParameters().CurrentAfterburnerState.ToString();
     }
 
 

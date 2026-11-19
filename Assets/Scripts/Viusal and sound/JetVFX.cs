@@ -23,8 +23,13 @@ public class JetVFX : MonoBehaviour
     float CurrentAlpaValue;
     float CurrentThrustLenght;
 
+    private JetPhysics Physics;
+
     private void Start()
     {
+
+        Physics = GetComponentInParent<JetPhysics>();
+
         engines = new[] { JetEngine1, JetEngine2 };
         vapors = new[] { JetVapor1, JetVapor2 };
 
@@ -52,11 +57,11 @@ public class JetVFX : MonoBehaviour
 
     private void Update()
     {
-        WingTrails.SetActive(GameEvent_Data.Instance.GetJetParameters().State == JetState.Air ? true : false);
+        WingTrails.SetActive(Physics.State == JetState.Air ? true : false);
 
-        CurrentThrustLenght = GameEvent_Data.Instance.JetData.GetThrust;
+        CurrentThrustLenght = Physics.Thrust;
 
-        CurrentAlpaValue = Mathf.Clamp01(GameEvent_Data.Instance.JetData.GetAOA);
+        CurrentAlpaValue = Mathf.Clamp01(Physics.AOA);
 
         Apply();
     }

@@ -86,7 +86,7 @@ public class JetSoundLogic : MonoBehaviour
     private void UpdateJetMovementSound()
     {
         float Step = InterpolationSpeed * Time.deltaTime;
-        AfterburnerState State = GameEvent_Data.Instance.GetJetParameters().CurrentState;
+        AfterburnerState State = GameEvent_Data.Instance.GetJetParameters().CurrentAfterburnerState;
 
         EngineLevel = Mathf.MoveTowards(EngineLevel, GameEvent_Data.Instance.JetData.GetThrust, Step);
         EngineThrust.volume = EngineLevel * MaxEngineThrustValue;

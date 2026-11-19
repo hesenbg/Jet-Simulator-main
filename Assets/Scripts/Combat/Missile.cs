@@ -3,7 +3,7 @@ using UnityEngine;
 
 public enum MissleState { Search, Chase }
 
-public class Missle : NetworkBehaviour
+public class Missile : NetworkBehaviour
 {
     [SerializeField] VisionCone cone;
     [SerializeField] Rigidbody rb;

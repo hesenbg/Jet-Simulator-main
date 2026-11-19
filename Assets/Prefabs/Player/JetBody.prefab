@@ -3050,6 +3050,11 @@ MonoBehaviour:
   MeshObject: {fileID: 6001160241546427849}
   Data: {fileID: 11400000, guid: 26a95a7c9fd08f24fb4cf3f0a9617b11, type: 2}
   HasInput: 0
+  _State: 0
+  _Thrust: 0
+  _Yaw: 0
+  _Pitch: 0
+  _Roll: 0
   ThrustVector: {x: 0, y: 0, z: 0}
   ThrustMag: 0
   Lift: {x: 0, y: 0, z: 0}
@@ -3057,7 +3062,7 @@ MonoBehaviour:
   Drag: {x: 0, y: 0, z: 0}
   DragMag: 0
   WeightMag: 0
-  AOA: 0
+  _AOA: 0
   LiftCoefficient: 0
   DragCoefficient: 0
   ThrustMinThreshold: 0
@@ -4242,7 +4247,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 3643f590bdf130d4c9f0a02caec509ae, type: 3}
+  m_Resource: {fileID: 8300000, guid: 0a9a9d9d62d64dc40ab0436dbdf45ac8, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.3
   m_Pitch: 1

@@ -5,7 +5,7 @@ public enum GamePhase { Session, Lobby, InGame, Dead, EndGame }
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] GameSessionUiLogic SessionUI;
+    [SerializeField] SessionLogic SessionUI;
 
     [SerializeField] LobbyLogic LobbyUI;
 

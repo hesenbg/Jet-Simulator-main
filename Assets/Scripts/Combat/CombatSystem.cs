@@ -38,7 +38,7 @@ public class CombatSystem : NetworkBehaviour
 
             NetworkId targetId = GameEvent_Data.Instance.GetLockedJet.transform.GetComponentInParent<NetworkObject>().Id;
 
-            if (Object.TryGetComponent<Missle>(out Missle Missle))
+            if (Object.TryGetComponent<Missile>(out Missile Missle))
             {
                 Missle.SetTarget(targetId);
             }
