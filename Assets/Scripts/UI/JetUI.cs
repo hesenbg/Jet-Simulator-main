@@ -24,6 +24,17 @@ public class JetUI : MonoBehaviour
     [Header("Ally List")]
     [SerializeField] RectTransform parent;
 
+
+    public void EnableUI()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void DisableUI()
+    {
+        gameObject.SetActive(false);
+    }
+
     private void UpdateJetConditions()
     {
         if (GameEvent_Data.Instance.JetData == null)
@@ -37,20 +48,20 @@ public class JetUI : MonoBehaviour
 
         AOA.text = GameEvent_Data.Instance.JetData.GetAOA.ToString("F1") + "°";
 
-        AfterburnerReady.text = GameEvent_Data.Instance.GetJetParameters().CurrentState.ToString();
+        AfterburnerReady.text = GameEvent_Data.Instance.GetJetParameters().CurrentAfterburnerState.ToString();
     }
 
 
 
     private void UpdateLockSystemUI()
     {
-        if (GameEvent_Data.Instance.LockedJet == null)
+        if (GameEvent_Data.Instance.GetLockedJet == null)
         {
             TargetLock.gameObject.SetActive(false);
             return;
         }
 
-        LockState state = GameEvent_Data.Instance.LockedJet.State;
+        LockState state = GameEvent_Data.Instance.GetLockedJet.State;
 
         if (state == LockState.Locked)
             TargetLock.gameObject.SetActive(true);
@@ -61,7 +72,7 @@ public class JetUI : MonoBehaviour
             return;
         }
 
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(GameEvent_Data.Instance.LockedJet.transform.position);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(GameEvent_Data.Instance.GetLockedJet.transform.position);
 
         screenPos.z = 0;
 

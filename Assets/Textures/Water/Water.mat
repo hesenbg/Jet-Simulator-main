@@ -58,7 +58,7 @@ Material:
     - _QueueOffset: 0
     - _RandomSpeed: 0.001
     - _Rate: 6.27
-    - _Smoothnes: 1
+    - _Smoothnes: 0.3
     - _WaveInt: 1
     - _WaveSpeed: 2
     - _WaveStrenght: 0.07

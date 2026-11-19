@@ -19,6 +19,8 @@ public class InputManager : MonoBehaviour
 
     [SerializeField] KeyCode AfterBurner;
 
+    [SerializeField] KeyCode Flare;
+
     [SerializeField] KeyCode FireKey;
 
     [Header("Input Values")]
@@ -42,7 +44,7 @@ public class InputManager : MonoBehaviour
     {
         GameEvent_Data.Instance.OnLocalPlayerJoined += PlayerJoined;
 
-        jetParameters.CurrentState = AfterburnerState.Ready;
+        jetParameters.CurrentAfterburnerState = AfterburnerState.Ready;
     }
 
     private void PlayerJoined(Transform transform)
@@ -57,14 +59,16 @@ public class InputManager : MonoBehaviour
         if (GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
             return;
 
-        if(jetParameters.CurrentState == AfterburnerState.Cooldown)
+        if(jetParameters.CurrentAfterburnerState == AfterburnerState.Cooldown)
         {
             jetParameters.CurrentAfterburnerCooldownDuration += Time.deltaTime;
             if(jetParameters.CurrentAfterburnerCooldownDuration >= jetParameters.AfterburnerCooldown)
             {
-                jetParameters.CurrentState = AfterburnerState.Ready;
+                jetParameters.CurrentAfterburnerState = AfterburnerState.Ready;
             }
         }
+
+
 
         UpdateScreenLock();
 
@@ -94,17 +98,17 @@ public class InputManager : MonoBehaviour
 
     IEnumerator AfterburnerPhase()
     {
-        jetParameters.CurrentState = AfterburnerState.Using;
+        jetParameters.CurrentAfterburnerState = AfterburnerState.Using;
         yield return new WaitForSeconds(jetParameters.AfterburnerDuration);
-        jetParameters.CurrentState = AfterburnerState.Cooldown;
+        jetParameters.CurrentAfterburnerState = AfterburnerState.Cooldown;
         jetParameters.CurrentAfterburnerCooldownDuration = 0;
     }
 
     private void UpdateJetMovementInputs(float dt)
     {
-        if (Input.GetKeyDown(AfterBurner) && jetParameters.CurrentState == AfterburnerState.Ready)
+        if (Input.GetKeyDown(AfterBurner) && jetParameters.CurrentAfterburnerState == AfterburnerState.Ready)
         {
-            jetParameters.CurrentState = AfterburnerState.Using;
+            jetParameters.CurrentAfterburnerState = AfterburnerState.Using;
             StartCoroutine(AfterburnerPhase());
         }
 

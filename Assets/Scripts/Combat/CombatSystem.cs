@@ -29,16 +29,16 @@ public class CombatSystem : NetworkBehaviour
 
     private void onShoot()
     {
-        if (GameEvent_Data.Instance.LockedJet == null)
+        if (GameEvent_Data.Instance.GetLockedJet == null)
             return;
 
-        if(GameEvent_Data.Instance.LockedJet.State == LockState.Locked)
+        if (GameEvent_Data.Instance.GetLockedJet.State == LockState.Locked)
         {
             NetworkObject Object = Runner.Spawn(misslePrefab, missleBay.position, Quaternion.LookRotation(missleBay.forward));
 
-            NetworkId targetId = GameEvent_Data.Instance.LockedJet.transform.GetComponentInParent<NetworkObject>().Id;
+            NetworkId targetId = GameEvent_Data.Instance.GetLockedJet.transform.GetComponentInParent<NetworkObject>().Id;
 
-            if (Object.TryGetComponent<Missle>(out Missle Missle))
+            if (Object.TryGetComponent<Missile>(out Missile Missle))
             {
                 Missle.SetTarget(targetId);
             }
@@ -71,7 +71,7 @@ public class CombatSystem : NetworkBehaviour
 
             float ScreenDist = Vector2.Distance(screenPos, ScreenCenter);
             float WorldDistance = Vector3.Distance(transform.position, target.transform.position);
- 
+
 
             if (ScreenDist <= MinScreenDist && WorldDistance < CombatData.MaxLockDistance && ScreenDist < CombatData.RadarDetectionSize)
             {
@@ -80,14 +80,17 @@ public class CombatSystem : NetworkBehaviour
             }
         }
 
-        RadarDetectable previous = GameEvent_Data.Instance.LockedJet;
+        RadarDetectable previous = GameEvent_Data.Instance.GetLockedJet;
 
         if (previous != closest) // if closest jet diffferent than the prev one, then start locking again
         {
             LockProgress = 0;
 
             if (previous != null)
+            {
+                previous.SetLockProgress(0);
                 previous.SetLockState(LockState.NoLock);
+            }
         }
 
         LockedJet = closest;
@@ -95,8 +98,11 @@ public class CombatSystem : NetworkBehaviour
 
     private void TryLockJet(RadarDetectable jet, Camera cam)
     {
-        if(jet== null)  
+        if (jet == null)
+        {
+            GameEvent_Data.Instance.SetLockedJet(null);
             return;
+        }
 
         Vector3 screenPos = cam.WorldToScreenPoint(jet.transform.position);
 
@@ -107,6 +113,7 @@ public class CombatSystem : NetworkBehaviour
         if (screenPos.z <= 0 || JetRCSintersectValue <= 0)   // z pos is for checking behind the screen
         {
             jet.SetLockState(LockState.NoLock);
+            GameEvent_Data.Instance.SetLockedJet(null);
             LockProgress = 0;
             return;
         }
@@ -114,9 +121,10 @@ public class CombatSystem : NetworkBehaviour
         Vector3 direction = jet.transform.position - transform.position;
 
         if (!Physics.Raycast(transform.position, direction.normalized, out RaycastHit hit, CombatData.MaxLockDistance)
-            || hit.collider.GetComponentInParent<RadarDetectable>() != jet)   
+            || hit.collider.GetComponentInParent<RadarDetectable>() != jet)
         {
             jet.SetLockState(LockState.NoLock);
+            GameEvent_Data.Instance.SetLockedJet(null);
             LockProgress = 0;
             return;
         }
@@ -125,11 +133,12 @@ public class CombatSystem : NetworkBehaviour
 
         jet.SetLockState(LockProgress >= 1 ? LockState.Locked : LockState.Locking);
 
-        if(jet.State != LockState.NoLock)
-        {
-            GameEvent_Data.Instance.LockedJet = jet;
-        }
+        jet.SetLockProgress(LockProgress);               
 
+        if (jet.State != LockState.NoLock)
+        {
+            GameEvent_Data.Instance.SetLockedJet(jet);
+        }
     }
 
     public override void FixedUpdateNetwork()

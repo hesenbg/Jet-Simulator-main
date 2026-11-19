@@ -17,9 +17,9 @@ public class Radar : MonoBehaviour
 
     private void Start()
     {
-        GameEvent_Data.Instance.OnPlayerLeft += OnPlayerLeft;
+        GameEvent_Data.Instance.OnPlayerDespawn += OnPlayerLeft;
 
-        GameEvent_Data.Instance.OnPlayerJoined += OnPlayerJoined;
+        GameEvent_Data.Instance.OnPlayerSpawned += OnPlayerJoined;
     }
 
     private void OnDestroy()
@@ -27,9 +27,9 @@ public class Radar : MonoBehaviour
         if (GameEvent_Data.Instance == null)
             return;
 
-        GameEvent_Data.Instance.OnPlayerLeft -= OnPlayerLeft;
+        GameEvent_Data.Instance.OnPlayerDespawn -= OnPlayerLeft;
 
-        GameEvent_Data.Instance.OnPlayerJoined -= OnPlayerJoined;
+        GameEvent_Data.Instance.OnPlayerSpawned -= OnPlayerJoined;
     }
 
     private void OnPlayerLeft(Transform transform, bool IsLocal)

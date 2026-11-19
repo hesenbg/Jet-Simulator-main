@@ -1,15 +1,17 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public enum GamePhase {Session, Lobby, InGame }
+public enum GamePhase { Session, Lobby, InGame, Dead, EndGame }
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] GameSessionUiLogic uiLogic;
+    [SerializeField] SessionLogic SessionUI;
 
-    [SerializeField] LobbyLogic LobbyLogic;
+    [SerializeField] LobbyLogic LobbyUI;
 
+    [SerializeField] JetUI JetUI;
+
+    [SerializeField] GameObject DeadScreen;
 
     private void Start()
     {
@@ -17,31 +19,92 @@ public class GameManager : MonoBehaviour
 
         GameEvent_Data.Instance.OnLocalPlayerJoined += OnPlayerJoined;
 
-        GameEvent_Data.Instance.OnLocalPlayerLeft += OnPlayerLeft;
+        GameEvent_Data.Instance.OnPlayerDespawn += OnPlayerDespawned;
+
+        GameEvent_Data.Instance.OnPlayerSpawned += OnPlayerSpawned;
+    }
+
+    private void OnPlayerSpawned(Transform transform, bool arg2)
+    {
+        if (!arg2)
+            return;
+
+        if (GameEvent_Data.Instance.CurrentPhase == GamePhase.Lobby)
+            return;
+
+        GameEvent_Data.Instance.CurrentPhase = GamePhase.InGame;
+    }
+
+    private void OnPlayerDespawned(Transform transform, bool arg2)
+    {
+        if (!arg2)
+            return;
+        GameEvent_Data.Instance.CurrentPhase = GamePhase.Dead;
     }
 
     private void OnPlayerJoined(Transform local)
     {
-        uiLogic.DisableUI();
-        LobbyLogic.EnableUI();
         GameEvent_Data.Instance.CurrentPhase = GamePhase.Lobby;
-    }
-
-    private void OnPlayerLeft()
-    {
-        uiLogic.EnableUI();
     }
 
     private void Update()
     {
-        if (LobbyLogic == null || LobbyLogic.Object == null || !LobbyLogic.Object.IsValid)
+
+        if (LobbyUI == null || LobbyUI.Object == null || !LobbyUI.Object.IsValid)
             return;
 
-        if (LobbyLogic.IsAllReady)
+        if (GameEvent_Data.Instance.CurrentPhase == GamePhase.Lobby && LobbyUI.IsAllReady)
         {
-            LobbyLogic.DisableUI();
-            LobbyLogic.DisableSessionJoin();
             GameEvent_Data.Instance.CurrentPhase = GamePhase.InGame;
         }
+
+        switch (GameEvent_Data.Instance.CurrentPhase)
+        {
+            case GamePhase.Session:
+                Session();
+                break;
+            case GamePhase.Lobby:
+                Lobby();
+                break;
+            case GamePhase.InGame:
+                InGame();
+                break;
+            case GamePhase.Dead:
+                Dead();
+                break;
+            case GamePhase.EndGame:
+                EndGame();
+                break;
+        }
+    }
+
+    private void Lobby()
+    {
+        SessionUI.DisableUI();
+        LobbyUI.EnableUI();
+    }
+
+    private void InGame()
+    {
+        DeadScreen.SetActive(false);
+        LobbyUI.DisableUI();
+        LobbyUI.DisableSessionJoin();
+        JetUI.EnableUI();
+    }
+
+    private void Dead()
+    {
+        JetUI.DisableUI();
+        DeadScreen.SetActive(true);
+    }
+
+    private void EndGame()
+    {
+
+    }
+
+    private void Session()
+    {
+        SessionUI.EnableUI();
     }
 }

@@ -2,9 +2,6 @@ using Fusion;
 using System;
 using UnityEngine;
 
-[RequireComponent (typeof(HealthManager))]
-[RequireComponent (typeof(NetworkObject))]
-
 [Serializable]
 public class RadarDetectable : MonoBehaviour
 {
@@ -14,20 +11,20 @@ public class RadarDetectable : MonoBehaviour
 
     [SerializeField] LockState currentLockState;
 
-    HealthManager healthManager;
+    [SerializeField] float lockProgress = 0;
 
     public LockState State => currentLockState;
 
     public float Stealth => stealth;
 
+    public float LockProgress => lockProgress;                                          
+
     public float Size => size;
+
+    public float SetLockProgress(float value) => lockProgress = value;
 
     public void SetLockState(LockState state) => currentLockState = state;
 
-    private void Awake()
-    {
-        healthManager = GetComponent<HealthManager>();
-    }
 
     private void Start()
     {

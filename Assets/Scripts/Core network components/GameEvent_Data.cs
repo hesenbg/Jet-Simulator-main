@@ -19,7 +19,9 @@ public class GameEvent_Data : MonoBehaviour
 
     [SerializeField] Volume GForcePostProcces;
 
-    public RadarDetectable LockedJet;
+    [SerializeField] private RadarDetectable LockedJet;
+
+    public GameManager Manager {  get; private set; }
 
     public JetData JetData {  get;  set; }
 
@@ -38,11 +40,13 @@ public class GameEvent_Data : MonoBehaviour
 
     public Action OnLocalPlayerLeft;
 
-    public Action<Transform,bool> OnPlayerJoined;
+    public Action<Transform,bool> OnPlayerSpawned;
 
-    public Action<Transform,bool> OnPlayerLeft;
+    public Action<Transform,bool> OnPlayerDespawn;
 
     public Action<List<SessionInfo>> OnSessionListUpdated;
+
+    public Action<Transform> OnPlayerRespawned;
 
     public Volume GetGForceVolume => GForcePostProcces;
 
@@ -50,6 +54,10 @@ public class GameEvent_Data : MonoBehaviour
     {
         radarDetectables.Add(radarDetectable);
     }
+
+    public RadarDetectable GetLockedJet => LockedJet;
+
+    public void SetLockedJet(RadarDetectable jet) { LockedJet = jet; } 
 
     public void RemoveRadarDetectable(RadarDetectable radarDetectable)
     {
@@ -92,5 +100,7 @@ public class GameEvent_Data : MonoBehaviour
     {
         NetworkSpawner.LocalPlayerJoined += local => OnLocalPlayerJoined?.Invoke(local);
         NetworkSpawner.LocalPlayerLeft += () => OnLocalPlayerLeft?.Invoke();
+
+        Manager = GetComponent<GameManager>();
     }
 }

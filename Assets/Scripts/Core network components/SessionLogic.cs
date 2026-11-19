@@ -1,22 +1,143 @@
-using TMPro;
+using Fusion;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using WebSocketSharp;
 
 public class SessionLogic : MonoBehaviour
 {
+    [SerializeField] private GameObject SessionUIPrefab;
 
-    [SerializeField] TextMeshProUGUI SessionName;
+    [SerializeField] private Transform SessionUI_Parent;
 
-    [SerializeField] Button SessionStartButton;
+    [SerializeField] private Spawner NetworkSpawner;
 
-    [SerializeField] TextMeshProUGUI PlayerCount;
+    [SerializeField] private float HeightDifferenceBetweenSessionUI = 60f;
 
-    public void ApplySettings(string sessionName, string playerCount, out Button StartButton) 
+    [SerializeField] private Canvas canvas;
+
+    [SerializeField] string SessionName;
+
+    [SerializeField] string PlayerName;
+
+    private bool isCreatingSession;
+
+    private void Start()
     {
-        StartButton = SessionStartButton;
 
-        SessionName.text = sessionName;
+        GameEvent_Data.Instance.OnLocalPlayerJoined += OnJoined;
 
-        PlayerCount.text = playerCount;
+        if (NetworkSpawner != null)
+        {
+            NetworkSpawner.OnSessionListUpdated += RefreshSessionUIlist;
+        }
+    }
+
+    private void OnJoined(Transform transform)
+    {
+        isCreatingSession = false;
+
+        transform.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
+
+        player.PlayerName = PlayerName;
+    }
+
+    private void OnDestroy()
+    {
+        if (NetworkSpawner != null)
+        {
+            NetworkSpawner.OnSessionListUpdated -= RefreshSessionUIlist;
+        }
+    }
+
+
+
+    public void AddPlayerName(string Name)
+    {
+        PlayerName = Name;
+    }
+
+    public void EnableUI()
+    {
+        canvas.gameObject.SetActive(true);
+    }
+
+    public void DisableUI()
+    {
+        canvas.gameObject.SetActive(false);
+    }
+
+    public void CreateSession()
+    {
+        if (isCreatingSession)
+            return;
+
+        if (SessionName.IsNullOrEmpty() || PlayerName.IsNullOrEmpty())
+            return;
+
+        isCreatingSession = true;
+
+        StartCoroutine(CreateSessionDelayed());
+    }
+
+    private IEnumerator CreateSessionDelayed()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        NetworkSpawner.CreateSession(SessionName);
+    }
+
+    public void AddNewSession(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            Debug.LogWarning("Session name cannot be empty.");
+            return;
+        }
+
+        SessionName = name;
+    }
+
+    public void RefreshSessionUIlist(List<SessionInfo> list)
+    {
+        foreach (Transform child in SessionUI_Parent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        int index = 0;
+
+        foreach (SessionInfo session in list)
+        {
+            if (session.IsVisible && session.IsOpen)
+            {
+                GameObject sessionItem = Instantiate(SessionUIPrefab, SessionUI_Parent);
+
+                if (sessionItem.TryGetComponent<RectTransform>(out RectTransform rectTransform))
+                {
+                    rectTransform.anchoredPosition = new Vector2(0f, index * HeightDifferenceBetweenSessionUI);
+                }
+
+                if (!sessionItem.TryGetComponent<SessionUI>(out SessionUI logic))
+                {
+                    index++;
+                    continue;
+                }
+
+                string roomName = session.Name;
+                string playerCountInfo = $"{session.PlayerCount}/{session.MaxPlayers}";
+
+                logic.ApplySettings(roomName, playerCountInfo, out Button startButton);
+
+                startButton.onClick.AddListener(() =>
+                {
+                    NetworkSpawner.JoinSession(roomName);
+                });
+
+                index++;
+            }
+        }
     }
 }

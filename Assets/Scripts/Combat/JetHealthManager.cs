@@ -9,6 +9,9 @@ public class JetHealthManager : HealthManager
 
     public override void OnDeath()
     {
-        
+        if (Object.HasStateAuthority)
+        {
+            Runner.Despawn(Object);
+        }
     }
 }

@@ -85,7 +85,7 @@ public class JetData : MonoBehaviour
     private void CalculateGForce()
     {
         float acceleration = SpeedChangeAmount.magnitude / TimeBetweenChanges;
-        GForce = (acceleration / 10f) + 1f;
+        GForce = (acceleration / 10f)+1;
         GForcePostProccesing.weight = Mathf.Lerp(GForcePostProccesing.weight, GForce / 10f, InterpolationSpeed * Time.deltaTime);
     }
 

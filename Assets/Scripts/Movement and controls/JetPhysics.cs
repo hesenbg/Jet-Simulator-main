@@ -14,12 +14,14 @@ public class JetPhysics : NetworkBehaviour
 
     public bool HasInput;
 
+    [Networked] public JetState State {  get; private set; }
+
     [Header("Debug - Networked Values")]
 
-    public float Thrust { set; get; }
-    public float Yaw { set; get; }
-    public float Pitch { set; get; }
-    public float Roll { set; get; }
+    [Networked] public float Thrust { set; get; }
+    [Networked] public float Yaw { set; get; }
+    [Networked] public float Pitch { set; get; }
+    [Networked] public float Roll { set; get; }
 
     public float networkDeltaTime { set; get; }
 
@@ -33,7 +35,7 @@ public class JetPhysics : NetworkBehaviour
     [SerializeField] float WeightMag;
 
     [Header("Aerodynamics")]
-    public float AOA;
+    [Networked] public float AOA { set; get; }
     [SerializeField] float LiftCoefficient;
     [SerializeField] float DragCoefficient;
 
@@ -45,9 +47,6 @@ public class JetPhysics : NetworkBehaviour
 
     float LiftAOA_0;
     float DragAOA_0;
-
-    [Header("State machine")]
-    public JetState State;
 
 
     private void Start()
@@ -79,7 +78,7 @@ public class JetPhysics : NetworkBehaviour
 
         GameEvent_Data.Instance.AddPlayerInstance(transform);
 
-        GameEvent_Data.Instance.OnPlayerJoined.Invoke(transform, HasStateAuthority);
+        GameEvent_Data.Instance.OnPlayerSpawned.Invoke(transform, HasStateAuthority);
 
         if (HasStateAuthority)
         {
@@ -93,7 +92,7 @@ public class JetPhysics : NetworkBehaviour
     {
         Data.CurrentAfterburnerCooldownDuration = 0;
 
-        GameEvent_Data.Instance.OnPlayerLeft.Invoke(transform, HasStateAuthority);
+        GameEvent_Data.Instance.OnPlayerDespawn.Invoke(transform, HasStateAuthority);
 
         GameEvent_Data.Instance.radarDetectables.Remove(GetComponent<RadarDetectable>());
 
@@ -132,7 +131,7 @@ public class JetPhysics : NetworkBehaviour
     private void StateMachine()
     {
         if (Physics.Raycast(transform.position, -transform.up, Data.AirThresholdDistance))
-            State = JetState.Ground;
+           State = JetState.Ground;
         else
             State = JetState.Air;
         
@@ -168,16 +167,14 @@ public class JetPhysics : NetworkBehaviour
 
     private void ApplyAfterburner()
     {
-        if (Data.CurrentState == AfterburnerState.Using)
-        {
-            Data.CurrentMaxVelocity = Data.AfterburnerMaxVelocity;
-            Data.CurrentThrustAmount = Data.AfterburnerForceAmount;
-        }
-        else
-        {
-            Data.CurrentThrustAmount = Data.ThrustForceAmount;
-            Data.CurrentMaxVelocity = Data.MaxVelocity;
-        }
+        bool isUsing = Data.CurrentAfterburnerState == AfterburnerState.Using;
+
+        float targetMaxVelocity = isUsing ? Data.AfterburnerMaxVelocity : Data.MaxVelocity;
+        float targetThrust = isUsing ? Data.AfterburnerForceAmount : Data.ThrustForceAmount;
+        float t = Data.AfterburnerTransitionSpeed * Runner.DeltaTime;
+
+        Data.CurrentMaxVelocity = Mathf.Lerp(Data.CurrentMaxVelocity, targetMaxVelocity, t);
+        Data.CurrentThrustAmount = Mathf.Lerp(Data.CurrentThrustAmount, targetThrust, t);
     }
 
     private void ApplyManeuver()
