@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class JetUI : MonoBehaviour
 {
@@ -21,9 +23,16 @@ public class JetUI : MonoBehaviour
 
     [SerializeField] RectTransform TargetLock;
 
+    [SerializeField] List<Sprite> LockAnimation;
+
+    [SerializeField] Color BaseTargetLockColor;
+
+    [SerializeField] Color LockedTargetColor;
+
+    [SerializeField] Image TargetLockImage;
+
     [Header("Ally List")]
     [SerializeField] RectTransform parent;
-
 
     public void EnableUI()
     {
@@ -61,9 +70,21 @@ public class JetUI : MonoBehaviour
             return;
         }
 
+        if (GameEvent_Data.Instance.GetLockedJet.State == LockState.NoLock || GameEvent_Data.Instance.GetLockedJet == null)
+        {
+            TargetLockImage.color = BaseTargetLockColor;
+            return;
+        }
+        else if (GameEvent_Data.Instance.GetLockedJet.State == LockState.Locked)
+        {
+            TargetLockImage.color = LockedTargetColor;
+        }
+
+        TargetLockImage.color = GameEvent_Data.Instance.GetLockedJet.State == LockState.Locked ? LockedTargetColor : BaseTargetLockColor;
+
         LockState state = GameEvent_Data.Instance.GetLockedJet.State;
 
-        if (state == LockState.Locked)
+        if (state == LockState.Locked ||  state == LockState.Locking)
             TargetLock.gameObject.SetActive(true);
 
         else

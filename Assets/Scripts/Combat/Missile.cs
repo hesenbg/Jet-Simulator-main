@@ -50,18 +50,50 @@ public class Missile : NetworkBehaviour
             rb.linearVelocity = transform.forward * speed;
     }
 
+    private bool IsTargetTrackable(Transform targetTransform)
+    {
+        if (targetTransform == null || !targetTransform.gameObject.activeInHierarchy)
+            return false;
+
+        RadarDetectable rd = targetTransform.GetComponentInParent<RadarDetectable>();
+        if (rd == null)
+            rd = targetTransform.GetComponentInChildren<RadarDetectable>();
+
+        if (rd != null && (rd.Stealth <= 0f || Mathf.Approximately(rd.Stealth, 0f)))
+            return false;
+
+        return true;
+    }
+
     public override void FixedUpdateNetwork()
     {
-        if (target == null && Runner.TryFindObject(TargetNetworkID, out NetworkObject targetObject))
+        if (target != null && !IsTargetTrackable(target))
         {
-            target = targetObject.transform;
+            target = null;
             hasPreviousTargetPosition = false;
+            if (HasStateAuthority)
+            {
+                TargetNetworkID = default;
+            }
         }
 
-        if (target == null)
+        if (target == null && Runner.TryFindObject(TargetNetworkID, out NetworkObject targetObject))
+        {
+            if (IsTargetTrackable(targetObject.transform))
+            {
+                target = targetObject.transform;
+                hasPreviousTargetPosition = false;
+            }
+            else if (HasStateAuthority)
+            {
+                TargetNetworkID = default;
+            }
+        }
+
+        if (target == null && cone != null)
         {
             Transform closest = cone.GetClosest();
-            if (closest != null)
+            if (closest != null && IsTargetTrackable(closest))
             {
                 target = closest;
                 hasPreviousTargetPosition = false;
@@ -79,6 +111,7 @@ public class Missile : NetworkBehaviour
             return;
         }
 
+        NoTargetTimer = TickTimer.CreateFromSeconds(Runner, 3f);
         state = MissleState.Chase;
         Chase();
     }

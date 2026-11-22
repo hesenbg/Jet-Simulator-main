@@ -96,9 +96,9 @@ MonoBehaviour:
   AirDensity: 1
   WeightAmplifier: 0.3
   InputDeadzone: 0
-  CurrentState: 2
-  RollAMP: 7
-  PitchAMP: 10
+  CurrentAfterburnerState: 0
+  RollAMP: 12
+  PitchAMP: 16
   YawAMP: 0.2
   GripFactor: 7
   AirThresholdDistance: 3

@@ -1,7 +1,9 @@
 using Fusion;
 using System;
 using UnityEngine;
-public enum LockState { NoLock, InsideLockZone, Locking, Locked }
+public enum LockState { NoLock, Locking, Locked }
+public enum FlareState { Ready, Using, Cooldown }
+
 public class CombatSystem : NetworkBehaviour
 {
     [SerializeField] public CombatData CombatData;
@@ -14,16 +16,24 @@ public class CombatSystem : NetworkBehaviour
 
     [SerializeField] RadarDetectable LockedJet;
 
+    [Networked] public FlareState CurrentFlareState {  get;  set; }
+
     Action OnShoot;
+
+    float BaseStealthValue;
 
     float LockProgress = 0;
 
     Vector2 ScreenCenter => new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
 
-    Vector3 pos;
+    public float FlareCooldown {  get; set; }
+
+    public float GetFlareDuration => CombatData.FlareDuration;
+
 
     public override void Spawned()
     {
+        BaseStealthValue = LocalJetRadarData.Stealth;
         OnShoot += onShoot;
     }
 
@@ -59,8 +69,6 @@ public class CombatSystem : NetworkBehaviour
 
         foreach (RadarDetectable target in GameEvent_Data.Instance.radarDetectables)
         {
-            pos = target.transform.position;
-
             if (target == LocalJetRadarData)
                 continue;
 
@@ -141,9 +149,18 @@ public class CombatSystem : NetworkBehaviour
         }
     }
 
+    private void UpdateVisibility()
+    {
+        LocalJetRadarData.SetSteath(CurrentFlareState == FlareState.Using ? 0f : BaseStealthValue);
+    }
+
     public override void FixedUpdateNetwork()
     {
         Camera cam = Camera.main;
+
+        CombatData.SetFlareCooldown(FlareCooldown);
+
+        UpdateVisibility();
 
         UpdateLockedJet(cam);
 

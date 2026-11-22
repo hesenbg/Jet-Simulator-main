@@ -69,6 +69,16 @@ public class InputManager : MonoBehaviour
         }
 
 
+        if (combatSystem.CurrentFlareState == FlareState.Cooldown)
+        {
+            combatSystem.FlareCooldown += Time.deltaTime;
+            if (combatSystem.FlareCooldown >= combatSystem.GetFlareDuration)
+            {
+                combatSystem.CurrentFlareState = FlareState.Ready;
+            }
+        }
+
+
 
         UpdateScreenLock();
 
@@ -104,12 +114,27 @@ public class InputManager : MonoBehaviour
         jetParameters.CurrentAfterburnerCooldownDuration = 0;
     }
 
+    IEnumerator FlarePhase()
+    {
+        combatSystem.CurrentFlareState = FlareState.Using;
+        yield return new WaitForSeconds(combatSystem.GetFlareDuration);
+        combatSystem.CurrentFlareState = FlareState.Cooldown;
+        combatSystem.FlareCooldown = 0;
+    }
+
     private void UpdateJetMovementInputs(float dt)
     {
         if (Input.GetKeyDown(AfterBurner) && jetParameters.CurrentAfterburnerState == AfterburnerState.Ready)
         {
             jetParameters.CurrentAfterburnerState = AfterburnerState.Using;
             StartCoroutine(AfterburnerPhase());
+        }
+
+        // flare
+        if(Input.GetKeyDown(Flare) && combatSystem.CurrentFlareState == FlareState.Ready)
+        {
+            combatSystem.CurrentFlareState = FlareState.Using;
+            StartCoroutine(FlarePhase());
         }
 
         if (Input.GetKey(ThrustForwardKey))

@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class JetVFX : MonoBehaviour
@@ -8,7 +10,14 @@ public class JetVFX : MonoBehaviour
     [SerializeField] ParticleSystem JetVapor1;
     [SerializeField] ParticleSystem JetVapor2;
 
+    [SerializeField] GameObject Flare;
+
     [SerializeField] GameObject WingTrails;
+
+    [SerializeField] GameObject[] Flares;
+
+    [SerializeField] float thrustSmoothing = 5f;
+    [SerializeField] float alphaSmoothing = 5f;
 
     ParticleSystem[] engines;
     ParticleSystem[] vapors;
@@ -23,13 +32,14 @@ public class JetVFX : MonoBehaviour
     float CurrentAlpaValue;
     float CurrentThrustLenght;
 
-    private JetPhysics Physics;
+    FlareState previousFlareState;
+
+    [SerializeField] JetData data;
+
+    [SerializeField] CombatSystem CombatSystem;
 
     private void Start()
     {
-
-        Physics = GetComponentInParent<JetPhysics>();
-
         engines = new[] { JetEngine1, JetEngine2 };
         vapors = new[] { JetVapor1, JetVapor2 };
 
@@ -53,17 +63,56 @@ public class JetVFX : MonoBehaviour
             vaporAlphaKeys[i] = gradient.alphaKeys;
             baseAlphaValues[i] = vaporAlphaKeys[i][0].alpha;
         }
+
+        CurrentThrustLenght = data.GetThrust;
+        CurrentAlpaValue = Mathf.Clamp01(data.GetAOA);
     }
 
     private void Update()
     {
-        WingTrails.SetActive(Physics.State == JetState.Air ? true : false);
+        WingTrails.SetActive(data.CurrentJetState == JetState.Air ? true : false);
 
-        CurrentThrustLenght = Physics.Thrust;
+        float targetThrust = data.GetThrust;
+        float targetAlpha = Mathf.Clamp01(data.GetAOA);
 
-        CurrentAlpaValue = Mathf.Clamp01(Physics.AOA);
+        CurrentThrustLenght = Mathf.Lerp(CurrentThrustLenght, targetThrust, 1f - Mathf.Exp(-thrustSmoothing * Time.deltaTime));
+        CurrentAlpaValue = Mathf.Lerp(CurrentAlpaValue, targetAlpha, 1f - Mathf.Exp(-alphaSmoothing * Time.deltaTime));
 
         Apply();
+
+        UpdateFlares();
+    }
+
+    private void UpdateFlares()
+    {
+        if (CombatSystem.Object == null || !CombatSystem.Object.IsValid)
+            return;
+
+        FlareState state = CombatSystem.CurrentFlareState;
+
+        if (state == previousFlareState)
+            return;
+
+        previousFlareState = state;
+
+        if (state == FlareState.Using)
+        {
+            StartCoroutine(SpawnFlares());
+        }
+    }
+
+    private IEnumerator SpawnFlares()
+    {
+        for (int i = 0; i < CombatSystem.CombatData.NumberOfBurst; i++)
+        {
+            foreach (GameObject point in Flares)
+            {
+                GameObject flare = Instantiate(Flare, point.transform.position, point.transform.rotation);
+                Destroy(flare, CombatSystem.GetFlareDuration);
+            }
+
+            yield return new WaitForSeconds(CombatSystem.CombatData.TimeBetweenFlareBursts);
+        }
     }
 
     private void Apply()
