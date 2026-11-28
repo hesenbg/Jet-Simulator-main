@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class JetUI : MonoBehaviour
 {
     [Header("Conditions")]
@@ -22,8 +21,6 @@ public class JetUI : MonoBehaviour
     [SerializeField] RectTransform CenterLock;
 
     [SerializeField] RectTransform TargetLock;
-
-    [SerializeField] List<Sprite> LockAnimation;
 
     [SerializeField] Color BaseTargetLockColor;
 
@@ -46,7 +43,7 @@ public class JetUI : MonoBehaviour
 
     private void UpdateJetConditions()
     {
-        if (GameEvent_Data.Instance.JetData == null)
+        if (GameEvent_Data.Instance.JetData == null || GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
             return;
 
         JetSpeed.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetSpeed).ToString() + " km/h";
@@ -59,8 +56,6 @@ public class JetUI : MonoBehaviour
 
         AfterburnerReady.text = GameEvent_Data.Instance.GetJetParameters().CurrentAfterburnerState.ToString();
     }
-
-
 
     private void UpdateLockSystemUI()
     {

@@ -108,7 +108,7 @@ public class JetVFX : MonoBehaviour
             foreach (GameObject point in Flares)
             {
                 GameObject flare = Instantiate(Flare, point.transform.position, point.transform.rotation);
-                Destroy(flare, CombatSystem.GetFlareDuration);
+                Destroy(flare, CombatSystem.CombatData.FlareDuration);
             }
 
             yield return new WaitForSeconds(CombatSystem.CombatData.TimeBetweenFlareBursts);

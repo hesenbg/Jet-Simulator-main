@@ -26,10 +26,6 @@ public class CombatSystem : NetworkBehaviour
 
     Vector2 ScreenCenter => new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
 
-    public float FlareCooldown {  get; set; }
-
-    public float GetFlareDuration => CombatData.FlareDuration;
-
 
     public override void Spawned()
     {
@@ -56,9 +52,13 @@ public class CombatSystem : NetworkBehaviour
         }
     }
 
-    public void FireOnShoot()
+    public bool FireOnShoot()
     {
-        OnShoot.Invoke();
+        if (GameEvent_Data.Instance.GetLockedJet == null || GameEvent_Data.Instance.GetLockedJet.State != LockState.Locked)
+            return false;
+
+        OnShoot?.Invoke();
+        return true;
     }
 
 
@@ -157,8 +157,6 @@ public class CombatSystem : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         Camera cam = Camera.main;
-
-        CombatData.SetFlareCooldown(FlareCooldown);
 
         UpdateVisibility();
 
