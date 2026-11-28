@@ -17,3 +17,6 @@ MonoBehaviour:
   reloadSpeed: 3
   maxLockDistance: 2500
   radarDetectionSize: 100
+  flareCooldown: 12
+  timeBetweenFlareBursts: 0.5
+  numberOfBurst: 6

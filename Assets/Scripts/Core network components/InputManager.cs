@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class InputManager : MonoBehaviour
     [Header("References")]
     [SerializeField] JetPhysics jetMovement;
     [SerializeField] JetParameters jetParameters;
+    [SerializeField] CombatData combatData;
     [SerializeField] CombatSystem combatSystem;
 
     [Header("Input Keys")]
@@ -34,6 +36,10 @@ public class InputManager : MonoBehaviour
     [Header("Private Vars")]
     private float currentThrust;
     private float currentYaw;
+    private float currentFlareCooldown;
+    private int currentMissileCount;
+    private float currentMissileReloadTime;
+    private bool isReloadingMissiles;
 
     private void Awake()
     {
@@ -42,20 +48,45 @@ public class InputManager : MonoBehaviour
 
     private void Start()
     {
-        GameEvent_Data.Instance.OnLocalPlayerJoined += PlayerJoined;
+        GameEvent_Data.Instance.OnPlayerSpawned += PlayerJoined;
 
         jetParameters.CurrentAfterburnerState = AfterburnerState.Ready;
+
+        ResetCombatState();
     }
 
-    private void PlayerJoined(Transform transform)
+    private void PlayerJoined(Transform Jet, bool IsStateAth)
     {
-        jetMovement = transform.gameObject.GetComponent<JetPhysics>();
 
-        combatSystem = transform.gameObject.GetComponent<CombatSystem>();
+        if (!IsStateAth)
+            return;
+
+        jetMovement = Jet.gameObject.GetComponent<JetPhysics>();
+
+        combatSystem = Jet.gameObject.GetComponent<CombatSystem>();
+
+        if (combatData == null && combatSystem != null)
+            combatData = combatSystem.CombatData;
+
+        ResetCombatState();
+    }
+
+
+    private void ResetCombatState()
+    {
+        if (combatData == null)
+            return;
+
+        currentMissileCount = combatData.MaxMissleCount;
+        currentMissileReloadTime = 0f;
+        isReloadingMissiles = false;
+        currentFlareCooldown = 0f;
     }  
      
     public void Update()
     {
+        UpdateScreenLock();
+
         if (GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
             return;
 
@@ -69,8 +100,28 @@ public class InputManager : MonoBehaviour
         }
 
 
+        if (combatSystem != null && combatData != null)
+        {
+            if (combatSystem.CurrentFlareState == FlareState.Cooldown)
+            {
+                currentFlareCooldown += Time.deltaTime;
+                if (currentFlareCooldown >= combatData.FlareCooldown)
+                {
+                    combatSystem.CurrentFlareState = FlareState.Ready;
+                }
+            }
 
-        UpdateScreenLock();
+            if (isReloadingMissiles)
+            {
+                currentMissileReloadTime += Time.deltaTime;
+                if (currentMissileReloadTime >= combatData.ReloadSpeed)
+                {
+                    currentMissileCount = combatData.MaxMissleCount;
+                    currentMissileReloadTime = 0f;
+                    isReloadingMissiles = false;
+                }
+            }
+        }
 
         UpdateWeaponInputs();
 
@@ -90,9 +141,17 @@ public class InputManager : MonoBehaviour
 
     private void UpdateWeaponInputs()
     {
-        if (Input.GetKeyDown(FireKey))
+        if (Input.GetKeyDown(FireKey) && !isReloadingMissiles && currentMissileCount > 0)
         {
-            combatSystem.FireOnShoot();
+            if (combatSystem.FireOnShoot())
+            {
+                currentMissileCount--;
+                if (currentMissileCount <= 0)
+                {
+                    isReloadingMissiles = true;
+                    currentMissileReloadTime = 0f;
+                }
+            }
         }
     }
 
@@ -104,12 +163,27 @@ public class InputManager : MonoBehaviour
         jetParameters.CurrentAfterburnerCooldownDuration = 0;
     }
 
+    IEnumerator FlarePhase()
+    {
+        combatSystem.CurrentFlareState = FlareState.Using;
+        yield return new WaitForSeconds(combatData.FlareDuration);
+        combatSystem.CurrentFlareState = FlareState.Cooldown;
+        currentFlareCooldown = 0f;
+    }
+
     private void UpdateJetMovementInputs(float dt)
     {
         if (Input.GetKeyDown(AfterBurner) && jetParameters.CurrentAfterburnerState == AfterburnerState.Ready)
         {
             jetParameters.CurrentAfterburnerState = AfterburnerState.Using;
             StartCoroutine(AfterburnerPhase());
+        }
+
+        // flare
+        if (combatSystem != null && combatData != null && Input.GetKeyDown(Flare) && combatSystem.CurrentFlareState == FlareState.Ready)
+        {
+            combatSystem.CurrentFlareState = FlareState.Using;
+            StartCoroutine(FlarePhase());
         }
 
         if (Input.GetKey(ThrustForwardKey))

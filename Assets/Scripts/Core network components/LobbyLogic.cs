@@ -2,119 +2,146 @@ using Fusion;
 using System;
 using UnityEngine;
 
+public struct PlayerPropeties : INetworkStruct
+{
+    public NetworkString<_32> Name;
+
+    public NetworkBool IsReady;
+}
+
 public class LobbyLogic : NetworkBehaviour
 {
-    [Networked, Capacity(3)]
-    public NetworkLinkedList<NetworkString<_32>> RedSide => default;
+    public event Action<int> OnIndexReceived;
 
     [Networked, Capacity(3)]
-    public NetworkLinkedList<NetworkString<_32>> BlueSide => default;
+    public NetworkDictionary<PlayerRef, PlayerPropeties> RedSide => default;
 
-    [Networked]  bool IsEligibleToStart { get; set; }
+    [Networked, Capacity(3)]
+    public NetworkDictionary<PlayerRef, PlayerPropeties> BlueSide => default;
 
-    [Networked] public bool IsAllReady { get; set; }
+    [Networked] public NetworkBool IsAllReady { get; set; }
+    [Networked] public int PlayerIndex { get; set; }
+    [Networked] private NetworkBool IsEligibleToStart { get; set; }
 
-    [SerializeField] Canvas canvas;
+    [SerializeField] private Canvas canvas;
+
+    public override void Spawned()
+    {
+        if (HasStateAuthority)
+            PlayerIndex = 0;
+    }
 
     public override void FixedUpdateNetwork()
     {
-        CheckAllReady();
+        if (!HasStateAuthority)
+            return;
 
+        IsAllReady = CheckAllReady();
         IsEligibleToStart = CheckLobbyEligible();
     }
 
-    public void EnableUI()
-    {
-        canvas.gameObject.SetActive(true);
-    }
+    public void EnableUI() => canvas.gameObject.SetActive(true);
 
-    public void DisableUI()
-    {
-        canvas.gameObject.SetActive(false);
-    }
+    public void DisableUI() => canvas.gameObject.SetActive(false);
 
-    public void SetReady()
-    {
-        if (!IsEligibleToStart)
-            return;
-        GameEvent_Data.Instance.GetLocalNetworkedPlayer().IsReady = true;
-    }
+    public void SetReady() => RPC_SetReady();
 
-    private bool CheckLobbyEligible()
-    {
-        foreach (Transform player in GameEvent_Data.Instance.PlayerInstances)
-        {
-            if (player.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer Networked))
-            {
-                if (Networked.PlayerSide == Side.Neutral)
-                    return false;
-            }
-        }
-        return true;
-    }
-
-    private void CheckAllReady()
-    {
-        IsAllReady = GameEvent_Data.Instance.CheckReadyAll();
-    }
-
-    public  void DisableSessionJoin()
+    public void DisableSessionJoin()
     {
         Runner.SessionInfo.IsOpen = false;
         Runner.SessionInfo.IsVisible = false;
     }
 
-    public void SetRedSide()
-    {
-        var player = GameEvent_Data.Instance.GetLocalNetworkedPlayer();
+    public void SetRedSide() => RPC_SetRedSide(SessionLogic.PlayerName);
 
-        if (player.PlayerSide == Side.Red)
-            return;
-        else if (player.PlayerSide== Side.Blue)
+    public void SetBlueSide() => RPC_SetBlueSide(SessionLogic.PlayerName);
+
+    public void SetPlayerSides()
+    {
+        foreach (Transform player in GameEvent_Data.Instance.PlayerInstances)
         {
-            RPC_DelBlueSide(player.PlayerName);
-        }
-        player.PlayerSide = Side.Red;
+            if (!player.TryGetComponent(out NetworkedPlayer networked) || !networked.Object.HasStateAuthority)
+                continue;
 
-        RPC_SetRedSide(player.PlayerName);
+            PlayerRef playerRef = networked.Object.InputAuthority;
+
+            if (RedSide.ContainsKey(playerRef))
+                networked.PlayerSide = Side.Red;
+            else if (BlueSide.ContainsKey(playerRef))
+                networked.PlayerSide = Side.Blue;
+        }
     }
 
-    public void SetBlueSide()
+    private bool CheckLobbyEligible()
     {
-        var player = GameEvent_Data.Instance.GetLocalNetworkedPlayer();
-
-        if (player.PlayerSide == Side.Blue)
-            return;
-        else if (player.PlayerSide == Side.Red)
+        foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            RPC_DelRedSide(player.PlayerName);
+            if (!RedSide.ContainsKey(player) && !BlueSide.ContainsKey(player))
+                return false;
         }
-        player.PlayerSide = Side.Blue;
 
-        RPC_SetBlueSide(player.PlayerName);
+        return true;
+    }
+
+    private bool CheckAllReady()
+    {
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            if (RedSide.TryGet(player, out PlayerPropeties props) || BlueSide.TryGet(player, out props))
+            {
+                if (!props.IsReady)
+                    return false;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void RPC_SetRedSide(NetworkString<_32> playerName)
+    public void RPC_GetIndex(RpcInfo info = default) => RPC_ReceiveIndex(info.Source, PlayerIndex++);
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ReceiveIndex([RpcTarget] PlayerRef target, int index) => OnIndexReceived?.Invoke(index);
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_SetRedSide(NetworkString<_32> playerName, RpcInfo info = default)
     {
-        RedSide.Add(playerName);
+        if (RedSide.ContainsKey(info.Source) || RedSide.Count >= RedSide.Capacity)
+            return;
+
+        BlueSide.Remove(info.Source);
+        RedSide.Add(info.Source, new PlayerPropeties { Name = playerName });
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void RPC_SetBlueSide(NetworkString<_32> playerName)
+    private void RPC_SetBlueSide(NetworkString<_32> playerName, RpcInfo info = default)
     {
-        BlueSide.Add(playerName);
+        if (BlueSide.ContainsKey(info.Source) || BlueSide.Count >= BlueSide.Capacity)
+            return;
+
+        RedSide.Remove(info.Source);
+        BlueSide.Add(info.Source, new PlayerPropeties { Name = playerName });
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void RPC_DelRedSide(NetworkString<_32> playerName)
+    private void RPC_SetReady(RpcInfo info = default)
     {
-        RedSide.Remove(playerName);
-    }
+        if (!IsEligibleToStart)
+            return;
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void RPC_DelBlueSide(NetworkString<_32> playerName)
-    {
-        BlueSide.Remove(playerName);
+        if (RedSide.TryGet(info.Source, out PlayerPropeties props))
+        {
+            props.IsReady = true;
+            RedSide.Set(info.Source, props);
+        }
+        else if (BlueSide.TryGet(info.Source, out props))
+        {
+            props.IsReady = true;
+            BlueSide.Set(info.Source, props);
+        }
     }
 }

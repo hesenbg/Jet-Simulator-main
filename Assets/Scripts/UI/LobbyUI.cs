@@ -29,7 +29,7 @@ public class LobbyUI : MonoBehaviour
         BlueTeamList.AddRange(BlueTeamNameParent.GetComponentsInChildren<TextMeshProUGUI>(true));
     }
 
-    private void OnJoined(Transform transform)
+    private void OnJoined()
     {
         HasGameStarted = true;
     }

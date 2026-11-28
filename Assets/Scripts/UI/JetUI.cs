@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class JetUI : MonoBehaviour
 {
     [Header("Conditions")]
@@ -21,9 +22,14 @@ public class JetUI : MonoBehaviour
 
     [SerializeField] RectTransform TargetLock;
 
+    [SerializeField] Color BaseTargetLockColor;
+
+    [SerializeField] Color LockedTargetColor;
+
+    [SerializeField] Image TargetLockImage;
+
     [Header("Ally List")]
     [SerializeField] RectTransform parent;
-
 
     public void EnableUI()
     {
@@ -37,7 +43,7 @@ public class JetUI : MonoBehaviour
 
     private void UpdateJetConditions()
     {
-        if (GameEvent_Data.Instance.JetData == null)
+        if (GameEvent_Data.Instance.JetData == null || GameEvent_Data.Instance.CurrentPhase != GamePhase.InGame)
             return;
 
         JetSpeed.text = Mathf.RoundToInt(GameEvent_Data.Instance.JetData.GetSpeed).ToString() + " km/h";
@@ -51,8 +57,6 @@ public class JetUI : MonoBehaviour
         AfterburnerReady.text = GameEvent_Data.Instance.GetJetParameters().CurrentAfterburnerState.ToString();
     }
 
-
-
     private void UpdateLockSystemUI()
     {
         if (GameEvent_Data.Instance.GetLockedJet == null)
@@ -61,9 +65,21 @@ public class JetUI : MonoBehaviour
             return;
         }
 
+        if (GameEvent_Data.Instance.GetLockedJet.State == LockState.NoLock || GameEvent_Data.Instance.GetLockedJet == null)
+        {
+            TargetLockImage.color = BaseTargetLockColor;
+            return;
+        }
+        else if (GameEvent_Data.Instance.GetLockedJet.State == LockState.Locked)
+        {
+            TargetLockImage.color = LockedTargetColor;
+        }
+
+        TargetLockImage.color = GameEvent_Data.Instance.GetLockedJet.State == LockState.Locked ? LockedTargetColor : BaseTargetLockColor;
+
         LockState state = GameEvent_Data.Instance.GetLockedJet.State;
 
-        if (state == LockState.Locked)
+        if (state == LockState.Locked ||  state == LockState.Locking)
             TargetLock.gameObject.SetActive(true);
 
         else

@@ -15,13 +15,41 @@ public class VisionCone : NetworkBehaviour
         count = Physics.OverlapSphereNonAlloc(transform.position, Radius, colliders, JetTarget);        
     }
 
+    private bool IsTargetTrackable(Transform targetTransform)
+    {
+        if (targetTransform == null || !targetTransform.gameObject.activeInHierarchy)
+            return false;
+
+        RadarDetectable rd = targetTransform.GetComponentInParent<RadarDetectable>();
+        if (rd == null)
+            rd = targetTransform.GetComponentInChildren<RadarDetectable>();
+
+        if (rd != null && (rd.Stealth <= 0f || Mathf.Approximately(rd.Stealth, 0f)))
+            return false;
+
+        return true;
+    }
+
     public Transform GetClosest()
     {
         Transform closest = null;
         float minSqrDist = float.MaxValue;
 
+        NetworkedPlayer localPlayer = GameEvent_Data.Instance != null ? GameEvent_Data.Instance.GetLocalNetworkedPlayer() : null;
+
         for (int i = 0; i < count; i++)
         {
+            if (colliders[i] == null) continue;
+
+            if (!IsTargetTrackable(colliders[i].transform)) continue;
+
+            NetworkedPlayer targetJet = colliders[i].GetComponentInParent<NetworkedPlayer>();
+            if (targetJet == null)
+                targetJet = colliders[i].GetComponentInChildren<NetworkedPlayer>();
+
+            if (targetJet != null && localPlayer != null && localPlayer.PlayerSide == targetJet.PlayerSide)
+                continue;
+
             Vector3 targetPos = colliders[i].transform.position;
             Vector3 toTarget = targetPos - transform.position;
 
@@ -34,16 +62,6 @@ public class VisionCone : NetworkBehaviour
 
             minSqrDist = sqrDist;
             closest = colliders[i].transform;
-        }
-        if (closest == null)
-            return null;
-
-        if(closest.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer targetJet))
-        {
-            if(GameEvent_Data.Instance.GetLocalNetworkedPlayer().PlayerSide== targetJet.PlayerSide)
-            {
-                return null;
-            }
         }
 
         return closest;

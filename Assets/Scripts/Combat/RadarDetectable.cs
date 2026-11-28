@@ -21,6 +21,8 @@ public class RadarDetectable : MonoBehaviour
 
     public float Size => size;
 
+    public void SetSteath(float Stealth) => stealth = Stealth;
+
     public float SetLockProgress(float value) => lockProgress = value;
 
     public void SetLockState(LockState state) => currentLockState = state;

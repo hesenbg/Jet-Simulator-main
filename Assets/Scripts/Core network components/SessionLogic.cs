@@ -20,14 +20,14 @@ public class SessionLogic : MonoBehaviour
 
     [SerializeField] string SessionName;
 
-    [SerializeField] string PlayerName;
+    [SerializeField] public static string PlayerName;
 
     private bool isCreatingSession;
 
     private void Start()
     {
 
-        GameEvent_Data.Instance.OnLocalPlayerJoined += OnJoined;
+        GameEvent_Data.Instance.OnPlayerSpawned += OnJoined;
 
         if (NetworkSpawner != null)
         {
@@ -35,11 +35,11 @@ public class SessionLogic : MonoBehaviour
         }
     }
 
-    private void OnJoined(Transform transform)
+    private void OnJoined(Transform Player, bool IsAthority)
     {
         isCreatingSession = false;
 
-        transform.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
+        Player.gameObject.TryGetComponent<NetworkedPlayer>(out NetworkedPlayer player);
 
         player.PlayerName = PlayerName;
     }
@@ -51,8 +51,6 @@ public class SessionLogic : MonoBehaviour
             NetworkSpawner.OnSessionListUpdated -= RefreshSessionUIlist;
         }
     }
-
-
 
     public void AddPlayerName(string Name)
     {

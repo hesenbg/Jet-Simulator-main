@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.Serialization;
+
 [CreateAssetMenu(fileName = "JetCombatData")]
 public class CombatData : ScriptableObject
 {
@@ -12,6 +14,12 @@ public class CombatData : ScriptableObject
 
     [SerializeField] float radarDetectionSize;
 
+    [SerializeField, FormerlySerializedAs("FlareCooldown")] float flareCooldown;
+
+    [SerializeField, FormerlySerializedAs("TimeBetweenFlareBursts")] float timeBetweenFlareBursts;
+
+    [SerializeField, FormerlySerializedAs("NumberOfBurst")] int numberOfBurst;
+
     public float LockSpeed => lockSpeed;
 
     public int MaxMissleCount => maxMissleCount;
@@ -21,4 +29,14 @@ public class CombatData : ScriptableObject
     public float RadarDetectionSize => radarDetectionSize;
 
     public float MaxLockDistance => maxLockDistance;
+
+    public float FlareDuration => timeBetweenFlareBursts * numberOfBurst;
+
+    public float FlareCooldown => flareCooldown;
+
+    public void SetFlareCooldown(float cooldown) => flareCooldown = cooldown;
+
+    public float TimeBetweenFlareBursts => timeBetweenFlareBursts;
+
+    public int NumberOfBurst => numberOfBurst;
 }

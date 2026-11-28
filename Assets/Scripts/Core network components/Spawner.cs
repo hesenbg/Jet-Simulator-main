@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using WebSocketSharp;
+using static Unity.Collections.Unicode;
 
 public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
 {
@@ -175,7 +176,7 @@ public class Spawner : MonoBehaviour, Fusion.INetworkRunnerCallbacks
     void Fusion.INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (player == runner.LocalPlayer)
-            SpawnPlayer();
+            GameEvent_Data.Instance.InvokeLocalPlayerJoined();
     }
 
     void Fusion.INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)

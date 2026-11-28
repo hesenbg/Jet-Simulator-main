@@ -26,6 +26,9 @@ public class GameManager : MonoBehaviour
 
     private void OnPlayerSpawned(Transform transform, bool arg2)
     {
+
+        Debug.Log("spawned");
+
         if (!arg2)
             return;
 
@@ -39,11 +42,16 @@ public class GameManager : MonoBehaviour
     {
         if (!arg2)
             return;
+
+        GameEvent_Data.Instance.SetPlayers();
+
         GameEvent_Data.Instance.CurrentPhase = GamePhase.Dead;
     }
 
-    private void OnPlayerJoined(Transform local)
+    private void OnPlayerJoined()
     {
+        Debug.Log("Joined");
+
         GameEvent_Data.Instance.CurrentPhase = GamePhase.Lobby;
     }
 
@@ -55,6 +63,7 @@ public class GameManager : MonoBehaviour
 
         if (GameEvent_Data.Instance.CurrentPhase == GamePhase.Lobby && LobbyUI.IsAllReady)
         {
+            GameEvent_Data.Instance.SpawnPlayer();
             GameEvent_Data.Instance.CurrentPhase = GamePhase.InGame;
         }
 

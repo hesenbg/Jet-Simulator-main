@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 
 public class DummyHealthManager : HealthManager
@@ -11,8 +12,12 @@ public class DummyHealthManager : HealthManager
     {
         if (Object.HasStateAuthority)
         {
-            GameEvent_Data.Instance.RemoveRadarDetectable(GetComponent<RadarDetectable>());
             Runner.Despawn(Object);
         }
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        GameEvent_Data.Instance.RemoveRadarDetectable(GetComponent<RadarDetectable>());
     }
 }

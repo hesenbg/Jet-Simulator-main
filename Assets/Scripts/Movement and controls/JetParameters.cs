@@ -1,8 +1,6 @@
 using UnityEngine;
 public enum AfterburnerState { Ready, Using, Cooldown }
 
-public enum FlareState { Ready, Using, Cooldown }
-
 [CreateAssetMenu(fileName = "JetParameters", menuName = "Jet/Jet Parameters")]
 public class JetParameters : ScriptableObject
 {
@@ -22,10 +20,6 @@ public class JetParameters : ScriptableObject
     public float CurrentAfterburnerCooldownDuration;
 
     public float AfterburnerTransitionSpeed;
-
-    public float FlareDuration;
-
-    public float FlareCooldown;
 
     [Header("Lift/Drag - Aerodynamics")]
     public float WingSurfaceArea;
@@ -48,7 +42,6 @@ public class JetParameters : ScriptableObject
 
     public AfterburnerState CurrentAfterburnerState;
 
-    public FlareState CurrentFlareState;
 
     [Header("Mounuver Amplifiers")]
     public float RollAMP;

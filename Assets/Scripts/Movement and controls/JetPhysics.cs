@@ -83,8 +83,6 @@ public class JetPhysics : NetworkBehaviour
         if (HasStateAuthority)
         {
             GameEvent_Data.Instance.JetData = GetComponentInChildren<JetData>();
-
-            GameEvent_Data.Instance.OnLocalPlayerJoined.Invoke(transform);
         }
     }
 

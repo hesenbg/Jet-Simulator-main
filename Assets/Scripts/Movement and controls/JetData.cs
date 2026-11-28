@@ -1,44 +1,48 @@
-using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class JetData : MonoBehaviour
 {
-    float GForce;
-
-    private float GForceMultipiler;
-
-    private Vector3 CurrentSpeed;
-
-    private float CurrentAOA;
-
-    JetPhysics Physics;
-
     [Header("Settings")]
     public float TimeBetweenChanges;
     public float CurrentTimeBetweenChanges;
+    public float InterpolationSpeed;
+    [SerializeField] private float BaseMinYlevel;
+    [SerializeField] private bool IsEnabled = true;
 
+    [Header("Detected Values")]
     public Vector3 DetectedSpeed;
     public float DetectedAOA;
-
     public Vector3 SpeedChangeAmount;
     public float AOAChangeAmount;
 
     public Volume GForcePostProccesing;
 
-    public float InterpolationSpeed;
+    private JetPhysics jetPhysics;
+    private CombatSystem Combat;
+    private Vector3 currentSpeed;
+    private float currentAOA;
+    private float gForce;
 
-    [SerializeField] float BaseMinYlevel;
-
-    [SerializeField] bool IsEnabled = true;
+    public JetState CurrentJetState => jetPhysics.State;
+    public float GetSpeed => jetPhysics != null && jetPhysics.rb != null ? jetPhysics.rb.linearVelocity.magnitude : 0f;
+    public float GetGForce => gForce;
+    public float GetAltitute => transform.position.y - BaseMinYlevel;
+    public float GetThrust => jetPhysics.Thrust;
+    public float GetAOA => jetPhysics != null && jetPhysics.rb != null ? jetPhysics.AOA : 0f;
+    public float GetRollValue => jetPhysics.Roll;
+    public float GetPitchValue => jetPhysics.Pitch;
+    public FlareState GetFlareState => Combat.CurrentFlareState;
 
     private void Start()
     {
-        Physics = GetComponentInParent<JetPhysics>();
+        jetPhysics = GetComponentInParent<JetPhysics>();
 
-        CurrentTimeBetweenChanges = 0;
+        Combat = GetComponentInParent<CombatSystem>();
 
-        if (Physics.HasStateAuthority)
+        CurrentTimeBetweenChanges = 0f;
+
+        if (jetPhysics.HasStateAuthority)
         {
             GForcePostProccesing = GameEvent_Data.Instance.GetGForceVolume;
         }
@@ -47,58 +51,44 @@ public class JetData : MonoBehaviour
             IsEnabled = false;
         }
     }
-    private void CalculateChanges()
-    {
-        if (CurrentTimeBetweenChanges < TimeBetweenChanges)
-        {
-            CurrentTimeBetweenChanges += Time.deltaTime;
-        }
-        else
-        {
-            SpeedChangeAmount = CurrentSpeed - DetectedSpeed;
-
-            AOAChangeAmount = CurrentAOA - DetectedAOA;
-
-            DetectedSpeed = CurrentSpeed;
-
-            DetectedAOA = CurrentAOA;
-
-            CurrentTimeBetweenChanges = 0;
-        }
-    }
 
     private void Update()
     {
-
         if (!IsEnabled)
             return;
-        CurrentSpeed = Physics.rb.linearVelocity;
 
-        CurrentAOA = Physics.AOA;
+        currentSpeed = jetPhysics.rb.linearVelocity;
+        currentAOA = jetPhysics.AOA;
 
         CalculateGForce();
-
         CalculateChanges();
-
     }
 
     private void CalculateGForce()
     {
         float acceleration = SpeedChangeAmount.magnitude / TimeBetweenChanges;
-        GForce = (acceleration / 10f)+1;
-        GForcePostProccesing.weight = Mathf.Lerp(GForcePostProccesing.weight, GForce / 10f, InterpolationSpeed * Time.deltaTime);
+        gForce = acceleration / 10f + 1f;
+
+        GForcePostProccesing.weight = Mathf.Lerp(
+            GForcePostProccesing.weight,
+            gForce / 10f,
+            InterpolationSpeed * Time.deltaTime);
     }
 
-    public float GetSpeed => Physics != null && Physics.rb != null ? Physics.rb.linearVelocity.magnitude : 0f;
-    public float GetGForce => GForce;
+    private void CalculateChanges()
+    {
+        if (CurrentTimeBetweenChanges < TimeBetweenChanges)
+        {
+            CurrentTimeBetweenChanges += Time.deltaTime;
+            return;
+        }
 
-    public float GetAltitute => transform.position.y - BaseMinYlevel;
+        SpeedChangeAmount = currentSpeed - DetectedSpeed;
+        AOAChangeAmount = currentAOA - DetectedAOA;
 
-    public float GetThrust => Physics.Thrust;
+        DetectedSpeed = currentSpeed;
+        DetectedAOA = currentAOA;
 
-    public float GetAOA => Physics != null && Physics.rb != null ? Physics.AOA : 0;
-
-    public float GetRollValue => Physics.Roll;
-
-    public float GetPitchValue => Physics.Pitch;
+        CurrentTimeBetweenChanges = 0f;
+    }
 }
